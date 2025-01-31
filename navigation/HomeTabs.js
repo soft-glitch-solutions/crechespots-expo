@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { View, Text } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { fetchProfile } from '../component/UserOperations/fetchProfile';
 
 import CrecheList from '../screens/CrecheList';
@@ -11,6 +10,13 @@ import Transport from '../screens/Transport';
 import FeedsList from '../screens/FeedsList';
 import MyCentre from '../screens/MyCentre';
 import supabase from '../supabaseClient';  // Import your supabase client
+
+// Import your images
+import HomeIcon from '../assets/images/newsfeed.png'; // Replace with your image path
+import ExploreIcon from '../assets/images/magnifier.png'; // Replace with your image path
+import MyCentresIcon from '../assets/images/daycare.png'; // Replace with your image path
+import NotificationsIcon from '../assets/images/notification.png'; // Replace with your image path
+import TransportIcon from '../assets/images/transport.png'; // Replace with your image path
 
 const Tab = createBottomTabNavigator();
 
@@ -49,35 +55,35 @@ const HomeTabs = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
+        tabBarIcon: ({ color, size, focused }) => {
+          let iconSource;
 
           switch (route.name) {
-            case 'CrecheList':
-              iconName = 'earth-outline';
+            case 'FeedsList':
+              iconSource = HomeIcon;
               break;
-            case 'ApplicationList':
-              iconName = 'global';
+            case 'CrecheList':
+              iconSource = ExploreIcon;
               break;
             case 'MyCentre':
-              iconName = 'school';
+              iconSource = MyCentresIcon;
               break;
             case 'Notifications':
-              iconName = 'notifications';
+              iconSource = NotificationsIcon;
               break;
             case 'Transport':
-              iconName = 'car';
-              break;
-            case 'FeedsList':
-              iconName = 'reader';
+              iconSource = TransportIcon;
               break;
             default:
-              iconName = 'help-circle';
+              iconSource = HomeIcon; // Default icon
           }
 
           return (
             <View>
-              <Ionicons name={iconName} size={size} color={color} />
+              <Image
+                source={iconSource}
+                style={[styles.icon, { tintColor: focused ? 'tomato' : 'gray' }]}
+              />
               {route.name === 'Notifications' && notificationCount > 0 && (
                 <View
                   style={{
@@ -116,5 +122,13 @@ const HomeTabs = () => {
     </Tab.Navigator>
   );
 };
+
+const styles = StyleSheet.create({
+  icon: {
+    width: 24, // Adjust the size as needed
+    height: 24, // Adjust the size as needed
+    resizeMode: 'contain',
+  },
+});
 
 export default HomeTabs;
