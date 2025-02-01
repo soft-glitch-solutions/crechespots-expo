@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import supabase from '../supabaseClient';
 
@@ -23,6 +23,16 @@ const helpIcon = require('../assets/icons/help.png');
 const supportIcon = require('../assets/icons/support.png');
 
 const Drawer = createDrawerNavigator();
+
+// Define unique background colors for each menu item's icon
+const menuItemIconColors = {
+  Home: '#FFDDC1', // Light orange
+  Settings: '#C1FFD7', // Light green
+  MyApplications: '#C1D7FF', // Light blue
+  Developer: '#FFC1E3', // Light pink
+  Help: '#FFC1C1', // Light red
+  Support: '#E3C1FF', // Light purple
+};
 
 const DrawerNavigator = () => {
   const [profile, setProfile] = useState({
@@ -86,34 +96,56 @@ const DrawerNavigator = () => {
     return (
       <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1 }}>
         <View style={styles.profileContainer}>
-          <TouchableOpacity onPress={() => props.navigation.navigate('Profile')}>
+          {loading ? (
+            <View style={[styles.profileImage, styles.imagePlaceholder]}>
+              <ActivityIndicator size="small" color="#4a90e2" />
+            </View>
+          ) : (
             <Image
-              source={{ uri: profile.profile_picture_url }} 
+              source={profile.profile_picture_url ? { uri: profile.profile_picture_url } : require('../assets/default-profile.png')}
               style={styles.profileImage}
             />
-            <Text style={styles.profileName}>{profile.display_name || 'User Name'}</Text>
-          </TouchableOpacity>
+          )}
+          <Text style={styles.profileName}>{profile.display_name || 'Loading...'}</Text>
         </View>
 
         <View style={styles.drawerItemsContainer}>
           <DrawerItem
             label="Home"
             icon={({ color, size }) => (
-              <Image source={homeIcon} style={styles.icon} />
+              <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Home }]}>
+                {loading ? (
+                  <View style={[styles.icon, styles.iconPlaceholder]} />
+                ) : (
+                  <Image source={homeIcon} style={styles.icon} />
+                )}
+              </View>
             )}
             onPress={() => props.navigation.navigate('Home')}
           />
           <DrawerItem
             label="Settings"
             icon={({ color, size }) => (
-              <Image source={settingsIcon} style={styles.icon} />
+              <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Settings }]}>
+                {loading ? (
+                  <View style={[styles.icon, styles.iconPlaceholder]} />
+                ) : (
+                  <Image source={settingsIcon} style={styles.icon} />
+                )}
+              </View>
             )}
             onPress={() => props.navigation.navigate('Settings')}
           />
           <DrawerItem
             label="My Applications"
             icon={({ color, size }) => (
-              <Image source={applicationsIcon} style={styles.icon} />
+              <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.MyApplications }]}>
+                {loading ? (
+                  <View style={[styles.icon, styles.iconPlaceholder]} />
+                ) : (
+                  <Image source={applicationsIcon} style={styles.icon} />
+                )}
+              </View>
             )}
             onPress={() => props.navigation.navigate('YourApplications')}
           />
@@ -121,7 +153,13 @@ const DrawerNavigator = () => {
             <DrawerItem
               label="Developer"
               icon={({ color, size }) => (
-                <Image source={developerIcon} style={styles.icon} />
+                <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Developer }]}>
+                  {loading ? (
+                    <View style={[styles.icon, styles.iconPlaceholder]} />
+                  ) : (
+                    <Image source={developerIcon} style={styles.icon} />
+                  )}
+                </View>
               )}
               onPress={() => props.navigation.navigate('DeveloperScreen')}
             />
@@ -132,14 +170,26 @@ const DrawerNavigator = () => {
           <DrawerItem
             label="Help"
             icon={({ color, size }) => (
-              <Image source={helpIcon} style={styles.icon} />
+              <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Help }]}>
+                {loading ? (
+                  <View style={[styles.icon, styles.iconPlaceholder]} />
+                ) : (
+                  <Image source={helpIcon} style={styles.icon} />
+                )}
+              </View>
             )}
             onPress={() => props.navigation.navigate('Help')}
           />
           <DrawerItem
             label="Support"
             icon={({ color, size }) => (
-              <Image source={supportIcon} style={styles.icon} />
+              <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Support }]}>
+                {loading ? (
+                  <View style={[styles.icon, styles.iconPlaceholder]} />
+                ) : (
+                  <Image source={supportIcon} style={styles.icon} />
+                )}
+              </View>
             )}
             onPress={() => props.navigation.navigate('Support')}
           />
@@ -178,7 +228,11 @@ const DrawerNavigator = () => {
               iconSource = helpIcon;
           }
 
-          return <Image source={iconSource} style={styles.icon} />;
+          return loading ? (
+            <View style={[styles.icon, styles.iconPlaceholder]} />
+          ) : (
+            <Image source={iconSource} style={styles.icon} />
+          );
         },
       })}
     >
@@ -210,6 +264,11 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     marginBottom: 10,
   },
+  imagePlaceholder: {
+    backgroundColor: '#e0e0e0',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   profileName: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -223,8 +282,20 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingVertical: 10,
   },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
   icon: {
     width: 24,
     height: 24,
+  },
+  iconPlaceholder: {
+    backgroundColor: '#e0e0e0',
+    borderRadius: 4,
   },
 });

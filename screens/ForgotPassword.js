@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { supabase } from '../supabaseClient';
 
 const ForgotPassword = ({ navigation }) => {
@@ -24,7 +24,6 @@ const ForgotPassword = ({ navigation }) => {
   };
 
   return (
-    <ImageBackground source={require('../assets/images/Background_mobile.png')} style={styles.container}>
       <View style={styles.innerContainer}>
         <Text style={styles.header}>Reset Password</Text>
         <TextInput
@@ -39,7 +38,6 @@ const ForgotPassword = ({ navigation }) => {
           <Text style={styles.buttonText}>{loading ? "Sending..." : "Send Reset Link"}</Text>
         </TouchableOpacity>
       </View>
-    </ImageBackground>
   );
 };
 

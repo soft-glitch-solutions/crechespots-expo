@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Pressable, ImageBackground, Image } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, Pressable, Image } from 'react-native';
 import supabase from '../../supabaseClient';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { fetchProfile } from '../../component/UserOperations/fetchProfile';
@@ -199,10 +199,6 @@ const ChatScreen = () => {
   }
 
   return (
-    <ImageBackground
-      source={require('../../assets/images/Background_mobile.png')} // Ensure correct path
-      style={styles.background}
-    >
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
@@ -236,7 +232,6 @@ const ChatScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </ImageBackground>
   );
 };
 

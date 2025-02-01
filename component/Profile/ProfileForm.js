@@ -1,10 +1,22 @@
 import React from 'react';
-import { View, TextInput, StyleSheet } from 'react-native';
+import { View, TextInput, StyleSheet, Picker } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import PropTypes from 'prop-types'; // Import PropTypes for type checking
+import PropTypes from 'prop-types';
+
+// List of South African provinces
+const southAfricanProvinces = [
+  'Eastern Cape',
+  'Free State',
+  'Gauteng',
+  'KwaZulu-Natal',
+  'Limpopo',
+  'Mpumalanga',
+  'Northern Cape',
+  'North West',
+  'Western Cape',
+];
 
 const ProfileForm = ({ profile, onChange }) => {
-  // Default to an empty object if profile is null or undefined
   const safeProfile = profile || {};
 
   return (
@@ -13,40 +25,20 @@ const ProfileForm = ({ profile, onChange }) => {
         <Icon name="user" size={20} color="#4a90e2" style={styles.icon} />
         <TextInput
           style={styles.input}
-          placeholder="Display Name"
-          value={safeProfile.display_name || ''}
-          onChangeText={(text) => onChange('display_name', text)}
-          accessibilityLabel="Display Name"
+          placeholder="Name"
+          value={safeProfile.name || ''}
+          onChangeText={(text) => onChange('name', text)}
+          accessibilityLabel="Name"
         />
       </View>
       <View style={styles.inputContainer}>
-        <Icon name="user" size={20} color="#4a90e2" style={styles.icon} />
+        <Icon name="envelope" size={20} color="#4a90e2" style={styles.icon} />
         <TextInput
           style={styles.input}
-          placeholder="First Name"
-          value={safeProfile.first_name || ''}
-          onChangeText={(text) => onChange('first_name', text)}
-          accessibilityLabel="First Name"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Icon name="user" size={20} color="#4a90e2" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Last Name"
-          value={safeProfile.last_name || ''}
-          onChangeText={(text) => onChange('last_name', text)}
-          accessibilityLabel="Last Name"
-        />
-      </View>
-      <View style={styles.inputContainer}>
-        <Icon name="phone" size={20} color="#4a90e2" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          value={safeProfile.phone_number || ''}
-          onChangeText={(text) => onChange('phone_number', text)}
-          accessibilityLabel="Phone Number"
+          placeholder="Email"
+          value={safeProfile.email || ''}
+          onChangeText={(text) => onChange('email', text)}
+          accessibilityLabel="Email"
         />
       </View>
       <View style={styles.inputContainer}>
@@ -60,6 +52,30 @@ const ProfileForm = ({ profile, onChange }) => {
         />
       </View>
       <View style={styles.inputContainer}>
+        <Icon name="map-marker" size={20} color="#4a90e2" style={styles.icon} />
+        <Picker
+          style={styles.picker}
+          selectedValue={safeProfile.province || ''}
+          onValueChange={(itemValue) => onChange('province', itemValue)}
+          accessibilityLabel="Province"
+        >
+          <Picker.Item label="Select Province" value="" />
+          {southAfricanProvinces.map((province, index) => (
+            <Picker.Item key={index} label={province} value={province} />
+          ))}
+        </Picker>
+      </View>
+      <View style={styles.inputContainer}>
+        <Icon name="map-marker" size={20} color="#4a90e2" style={styles.icon} />
+        <TextInput
+          style={styles.input}
+          placeholder="City"
+          value={safeProfile.city || ''}
+          onChangeText={(text) => onChange('city', text)}
+          accessibilityLabel="City"
+        />
+      </View>
+      <View style={styles.inputContainer}>
         <Icon name="info-circle" size={20} color="#4a90e2" style={styles.icon} />
         <TextInput
           style={styles.bioInput}
@@ -70,30 +86,18 @@ const ProfileForm = ({ profile, onChange }) => {
           accessibilityLabel="Bio"
         />
       </View>
-      <View style={styles.inputContainer}>
-        <Icon name="envelope" size={20} color="#4a90e2" style={styles.icon} />
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={safeProfile.email || ''}
-          editable={false}
-          accessibilityLabel="Email"
-        />
-      </View>
     </>
   );
 };
 
-// PropTypes validation
 ProfileForm.propTypes = {
   profile: PropTypes.shape({
-    display_name: PropTypes.string,
-    first_name: PropTypes.string,
-    last_name: PropTypes.string,
-    phone_number: PropTypes.string,
-    id_number: PropTypes.string,
-    bio: PropTypes.string,
+    name: PropTypes.string,
     email: PropTypes.string,
+    id_number: PropTypes.string,
+    province: PropTypes.string,
+    city: PropTypes.string,
+    bio: PropTypes.string,
   }),
   onChange: PropTypes.func.isRequired,
 };
@@ -118,6 +122,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 4,
     textAlignVertical: 'top',
+  },
+  picker: {
+    flex: 1,
+    height: 40,
+    paddingHorizontal: 10,
   },
   icon: {
     marginRight: 10,

@@ -17,28 +17,29 @@ import ChatScreen from '../screens/chat/ChatScreen';
 import DeveloperScreen from '../screens/developer/DeveloperScreen';
 import NewsDetails from '../screens/NewsDetails';
 import ChangePassword from '../screens/ChangePassword';
-import { TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
   const [isOnboardingComplete, setIsOnboardingComplete] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
+    const checkStatus = async () => {
       try {
-        const status = await AsyncStorage.getItem('onboardingCompleted');
-        setIsOnboardingComplete(status === 'true');
+        const onboardingStatus = await AsyncStorage.getItem('onboardingCompleted');
+        const authToken = await AsyncStorage.getItem('authToken'); // Example: Check for token
+        setIsOnboardingComplete(onboardingStatus === 'true');
+        setIsAuthenticated(!!authToken);
       } catch (error) {
-        console.error('Failed to check onboarding status:', error);
+        console.error('Error checking onboarding/auth status:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkOnboardingStatus();
+    checkStatus();
   }, []);
 
   const handleOnboardingComplete = async () => {
@@ -51,36 +52,35 @@ const AppNavigator = () => {
   };
 
   if (isLoading) {
-    return null;
+    return null; // Add a loading spinner here if desired
   }
 
   return (
-    <Stack.Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
       {!isOnboardingComplete ? (
-        <Stack.Screen name="Onboarding" options={{ headerShown: false }}>
+        <Stack.Screen name="Onboarding">
           {props => <OnboardingScreen {...props} onComplete={handleOnboardingComplete} />}
         </Stack.Screen>
+      ) : !isAuthenticated ? (
+        <>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+          <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
+        </>
       ) : (
         <>
-          <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
-          <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
-          <Stack.Screen name="CrecheDetails" component={CrecheDetails} options={{ headerShown: false }} />
-          <Stack.Screen name="ApplicationDetails" component={ApplicationDetails} options={{ headerShown: false }} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
-          <Stack.Screen name="EditApplication" component={EditApplication} options={{ headerShown: false }} /> 
-          <Stack.Screen name="MyCentreDetails" component={MyCentreDetails} options={{ headerShown: false }} />
-          <Stack.Screen name="LessonsDetails" component={LessonsDetails} options={{ headerShown: false }} />
-          <Stack.Screen name="FeedDetails" component={FeedDetails} options={{ headerShown: false }} />
+          <Stack.Screen name="CrecheDetails" component={CrecheDetails} />
+          <Stack.Screen name="ApplicationDetails" component={ApplicationDetails} />
+          <Stack.Screen name="EditApplication" component={EditApplication} />
+          <Stack.Screen name="MyCentreDetails" component={MyCentreDetails} />
+          <Stack.Screen name="LessonsDetails" component={LessonsDetails} />
+          <Stack.Screen name="FeedDetails" component={FeedDetails} />
           <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
-          <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="DeveloperScreen" component={DeveloperScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="NewsDetails" component={NewsDetails} options={{ headerShown: false }} />
-          <Stack.Screen name="ChangePassword" component={ChangePassword} options={{ headerShown: false }} />
-          <Stack.Screen 
-            name="DrawerNavigator" 
-            component={DrawerNavigator} 
-            options={{ headerShown: false }}
-          />
+          <Stack.Screen name="ChatScreen" component={ChatScreen} />
+          <Stack.Screen name="DeveloperScreen" component={DeveloperScreen} />
+          <Stack.Screen name="NewsDetails" component={NewsDetails} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} />
         </>
       )}
     </Stack.Navigator>

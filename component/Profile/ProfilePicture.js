@@ -40,7 +40,7 @@ const ProfilePicture = () => {
             resizeMode="cover"
           />
         ) : (
-            <text>test</text>
+          <Text>Loading...</Text>
         )}
       </TouchableOpacity>
 
@@ -59,7 +59,7 @@ const ProfilePicture = () => {
                 resizeMode="cover"
               />
             ) : (
-              <text>test</text>
+              <Text>Loading...</Text>
             )}
             <Button
               title="Change Profile Picture"
