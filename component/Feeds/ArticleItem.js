@@ -37,7 +37,7 @@ const ArticleItem = ({ article, isHearted, onHeart, onSave, onReport }) => {
         <Text style={styles.articleAuthor}>{article.author.display_name}</Text>
         <Text style={styles.articleTime}>{article.time}</Text>
         <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
-          <Icon name="dots-vertical" size={24} color="#000" />
+          <Icon name="dots-vertical" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
       <Text style={styles.articleTitle}>{article.title}</Text>

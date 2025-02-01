@@ -14,7 +14,7 @@ import supabase from '../supabaseClient';  // Import your supabase client
 // Import your images
 import HomeIcon from '../assets/images/newsfeed.png'; // Replace with your image path
 import ExploreIcon from '../assets/images/magnifier.png'; // Replace with your image path
-import MyCentresIcon from '../assets/images/daycare.png'; // Replace with your image path
+import MyCentresIcon from '../assets/images/children.png'; // Replace with your image path
 import NotificationsIcon from '../assets/images/notification.png'; // Replace with your image path
 import TransportIcon from '../assets/images/transport.png'; // Replace with your image path
 
@@ -82,7 +82,13 @@ const HomeTabs = () => {
             <View>
               <Image
                 source={iconSource}
-                style={[styles.icon, { tintColor: focused ? 'tomato' : 'gray' }]}
+                style={[
+                  styles.icon,
+                  { 
+
+                  }
+                ]}
+                importantForAccessibility="yes"
               />
               {route.name === 'Notifications' && notificationCount > 0 && (
                 <View
@@ -116,7 +122,7 @@ const HomeTabs = () => {
     >
       <Tab.Screen name="FeedsList" component={FeedsList} options={{ tabBarLabel: 'Home' }} />
       <Tab.Screen name="CrecheList" component={CrecheList} options={{ tabBarLabel: 'Explore' }} />
-      <Tab.Screen name="MyCentre" component={MyCentre} options={{ tabBarLabel: 'My Centres' }} />
+      <Tab.Screen name="MyCentre" component={MyCentre} options={{ tabBarLabel: 'My Child' }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarLabel: 'Notifications' }} />
       <Tab.Screen name="Transport" component={Transport} options={{ tabBarLabel: 'Transport' }} />
     </Tab.Navigator>
@@ -125,9 +131,10 @@ const HomeTabs = () => {
 
 const styles = StyleSheet.create({
   icon: {
-    width: 24, // Adjust the size as needed
-    height: 24, // Adjust the size as needed
+    width: 24,
+    height: 24,
     resizeMode: 'contain',
+    opacity: 1,
   },
 });
 

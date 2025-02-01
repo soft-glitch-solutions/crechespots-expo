@@ -17,7 +17,8 @@ import ChatScreen from '../screens/chat/ChatScreen';
 import DeveloperScreen from '../screens/developer/DeveloperScreen';
 import NewsDetails from '../screens/NewsDetails';
 import ChangePassword from '../screens/ChangePassword';
-
+import { TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 const Stack = createStackNavigator();
 
@@ -50,7 +51,6 @@ const AppNavigator = () => {
   };
 
   if (isLoading) {
-    // You can return a loading spinner or splash screen here
     return null;
   }
 
@@ -76,7 +76,11 @@ const AppNavigator = () => {
           <Stack.Screen name="DeveloperScreen" component={DeveloperScreen} options={{ headerShown: false }} />
           <Stack.Screen name="NewsDetails" component={NewsDetails} options={{ headerShown: false }} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} options={{ headerShown: false }} />
-          <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} options={{ headerShown: false }} />
+          <Stack.Screen 
+            name="DrawerNavigator" 
+            component={DrawerNavigator} 
+            options={{ headerShown: false }}
+          />
         </>
       )}
     </Stack.Navigator>

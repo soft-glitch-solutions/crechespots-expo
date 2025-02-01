@@ -4,6 +4,9 @@ import supabase from '../supabaseClient';
 import ProfileAlert from '../component/user/ProfileAlert';
 import AddArticleButton from '../component/Feeds/AddArticleButton';
 import ArticleItem from '../component/Feeds/ArticleItem';
+import OpenDrawerButton from '../component/OpenDrawerButton';
+import NotificationButton from '../component/NotificationButton';
+import ProfileButton from '../component/ProfileButton';
 
 const FeedsList = ({ navigation }) => {
   const [profile, setProfile] = useState({});
@@ -236,6 +239,13 @@ const handleUnheartArticle = async (articleId) => {
     <FlatList
       ListHeaderComponent={() => (
         <View style={styles.header}>
+          <View style={styles.headerContainer}>
+          <OpenDrawerButton />
+          <View style={styles.rightButtons}>
+            <NotificationButton />
+            <ProfileButton />
+          </View>
+        </View>
           <AddArticleButton />
         </View>
       )}
@@ -261,6 +271,16 @@ const handleUnheartArticle = async (articleId) => {
 const styles = StyleSheet.create({
   header: {
     padding: 16,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 10,
+  },
+  rightButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   title: {
     fontSize: 24,

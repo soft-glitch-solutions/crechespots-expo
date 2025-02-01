@@ -8,7 +8,6 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <NavigationContainer
-        fallback={<View />} // Fallback while loading
       >
         <AppNavigator />
       </NavigationContainer>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import supabase from '../supabaseClient';
 
 import HomeTabs from './HomeTabs';
@@ -14,6 +13,14 @@ import Profile from '../screens/Profile';
 import YourApplications from '../screens/YourApplications';
 import ChatListScreen from '../screens/chat/ChatListScreen';
 import DeveloperScreen from '../screens/developer/DeveloperScreen';
+
+// Import your images
+const homeIcon = require('../assets/icons/home.png');
+const settingsIcon = require('../assets/icons/settings.png');
+const applicationsIcon = require('../assets/icons/applications.png');
+const developerIcon = require('../assets/icons/developer.png');
+const helpIcon = require('../assets/icons/help.png');
+const supportIcon = require('../assets/icons/support.png');
 
 const Drawer = createDrawerNavigator();
 
@@ -92,35 +99,21 @@ const DrawerNavigator = () => {
           <DrawerItem
             label="Home"
             icon={({ color, size }) => (
-              <Ionicons name="home" size={size} color={color} />
+              <Image source={homeIcon} style={styles.icon} />
             )}
             onPress={() => props.navigation.navigate('Home')}
           />
           <DrawerItem
             label="Settings"
             icon={({ color, size }) => (
-              <Ionicons name="settings" size={size} color={color} />
+              <Image source={settingsIcon} style={styles.icon} />
             )}
             onPress={() => props.navigation.navigate('Settings')}
           />
           <DrawerItem
-            label="Messages"
-            icon={({ color, size }) => (
-              <Ionicons name="chatbubble" size={size} color={color} />
-            )}
-            onPress={() => props.navigation.navigate('ChatListScreen')}
-          />
-          <DrawerItem
-            label="News"
-            icon={({ color, size }) => (
-              <Ionicons name="newspaper" size={size} color={color} />
-            )}
-            onPress={() => props.navigation.navigate('News')}
-          />
-          <DrawerItem
             label="My Applications"
             icon={({ color, size }) => (
-              <Ionicons name="apps" size={size} color={color} />
+              <Image source={applicationsIcon} style={styles.icon} />
             )}
             onPress={() => props.navigation.navigate('YourApplications')}
           />
@@ -128,7 +121,7 @@ const DrawerNavigator = () => {
             <DrawerItem
               label="Developer"
               icon={({ color, size }) => (
-                <Ionicons name="code" size={size} color={color} />
+                <Image source={developerIcon} style={styles.icon} />
               )}
               onPress={() => props.navigation.navigate('DeveloperScreen')}
             />
@@ -139,14 +132,14 @@ const DrawerNavigator = () => {
           <DrawerItem
             label="Help"
             icon={({ color, size }) => (
-              <Ionicons name="help-circle" size={size} color={color} />
+              <Image source={helpIcon} style={styles.icon} />
             )}
             onPress={() => props.navigation.navigate('Help')}
           />
           <DrawerItem
             label="Support"
             icon={({ color, size }) => (
-              <Ionicons name="headset" size={size} color={color} />
+              <Image source={supportIcon} style={styles.icon} />
             )}
             onPress={() => props.navigation.navigate('Support')}
           />
@@ -160,51 +153,43 @@ const DrawerNavigator = () => {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={({ route }) => ({
         drawerIcon: ({ color, size }) => {
-          let iconName;
+          let iconSource;
 
           switch (route.name) {
             case 'Home':
-              iconName = 'home';
+              iconSource = homeIcon;
               break;
             case 'Settings':
-              iconName = 'settings';
+              iconSource = settingsIcon;
               break;
             case 'ChatListScreen':
-              iconName = 'chatbubble';
-              break;
-            case 'News':
-              iconName = 'newspaper';
-              break;
-            case 'My Applications':
-              iconName = 'document';
+              iconSource = messagesIcon;
               break;
             case 'Help':
-              iconName = 'help-circle';
+              iconSource = helpIcon;
               break;
             case 'Support':
-              iconName = 'headset';
+              iconSource = supportIcon;
               break;
             case 'DeveloperScreen':
-              iconName = 'code';
+              iconSource = developerIcon;
               break;
             default:
-              iconName = 'help-circle';
+              iconSource = helpIcon;
           }
 
-          return <Ionicons name={iconName} size={size} color={color} />;
+          return <Image source={iconSource} style={styles.icon} />;
         },
       })}
     >
-      <Drawer.Screen name="Home" component={HomeTabs} />
-      <Drawer.Screen name="Profile" component={Profile} />
-      <Drawer.Screen name="Settings" component={Settings} />
-      <Drawer.Screen name="ChatListScreen" component={ChatListScreen} />
-      <Drawer.Screen name="News" component={News} />
-      <Drawer.Screen name="Help" component={Help} />
-      <Drawer.Screen name="Support" component={Support} />
-      <Drawer.Screen name="YourApplications" component={YourApplications} />
+      <Drawer.Screen name="Home" component={HomeTabs} options={{ headerShown: false }} />
+      <Drawer.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
+      <Drawer.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
+      <Drawer.Screen name="Help" component={Help} options={{ headerShown: false }} />
+      <Drawer.Screen name="Support" component={Support} options={{ headerShown: false }} />
+      <Drawer.Screen name="YourApplications" component={YourApplications} options={{ headerShown: false }} />
       {isDeveloper && (
-        <Drawer.Screen name="DeveloperScreen" component={DeveloperScreen} />
+        <Drawer.Screen name="DeveloperScreen" component={DeveloperScreen} options={{ headerShown: false }} />
       )}
     </Drawer.Navigator>
   );
@@ -237,5 +222,9 @@ const styles = StyleSheet.create({
     borderTopColor: '#f4f4f4',
     borderTopWidth: 1,
     paddingVertical: 10,
+  },
+  icon: {
+    width: 24,
+    height: 24,
   },
 });
