@@ -13,38 +13,43 @@ const CrecheItem = ({ creche, onSelectCreche }) => {
       style={styles.crecheItem}
       onPress={() => onSelectCreche(creche.id)}
     >
-      <View style={styles.crecheHeader}>
-        <Text style={styles.name}>{creche.name}</Text>
-        <View style={styles.logoContainer}>
-          <Image
-            source={{ uri: logoUri }}
-            style={styles.logo}
-            onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
-          />
-          {creche.registered && (
-            <Image
-              source={registeredIcon}
-              style={styles.registeredIcon}
-            />
-          )}
-        </View>
+      {/* Main Image */}
+      <Image
+        source={{ uri: logoUri }}
+        style={styles.mainImage}
+        onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
+      />
+
+      {/* Price and Availability */}
+      <View style={styles.priceContainer}>
+        <Text style={styles.price}>R {creche.weekly_price}</Text>
+        <Text style={styles.availability}>OPEN</Text>
       </View>
-      <View style={styles.infoContainer}>
-        <View style={styles.infoItem}>
-          <Ionicons name="location-outline" size={20} color="black" />
-          <Text style={styles.infoText}>Address: {creche.address}</Text>
-        </View>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>Weekly Price: R {creche.weekly_price}</Text>
-          <Text style={styles.price}>Monthly Price: R {creche.monthly_price}</Text>
-        </View>
-        <View style={styles.infoItem}>
-          <Ionicons name="navigate-outline" size={20} color="black" />
-          <Text style={styles.infoText}>
-            Distance: {creche.distance ? creche.distance.toFixed(2) : 'N/A'} km
-          </Text>
-        </View>
+
+      {/* Title and Location */}
+      <Text style={styles.title}>{creche.name}</Text>
+      <View style={styles.locationContainer}>
+        <Ionicons name="location-outline" size={16} color="#666" />
+        <Text style={styles.locationText}>{creche.address}</Text>
       </View>
+
+      {/* Distance */}
+      <View style={styles.distanceContainer}>
+        <Ionicons name="navigate-outline" size={16} color="#666" />
+        <Text style={styles.distanceText}>
+          {creche.distance ? creche.distance.toFixed(2) : 'N/A'} km
+        </Text>
+      </View>
+
+      {/* Registered Icon */}
+      {creche.registered && (
+        <Image
+          source={registeredIcon}
+          style={styles.registeredIcon}
+        />
+      )}
+
+      {/* View Details Button */}
       <TouchableOpacity style={styles.detailsButton} onPress={() => onSelectCreche(creche.id)}>
         <Text style={styles.detailsButtonText}>View Details</Text>
       </TouchableOpacity>
@@ -54,73 +59,84 @@ const CrecheItem = ({ creche, onSelectCreche }) => {
 
 const styles = StyleSheet.create({
   crecheItem: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    backgroundColor: '#f9f9f9',
-    marginBottom: 16,
+    backgroundColor: '#fff',
     borderRadius: 10,
-    shadowColor: '#000000',
+    marginBottom: 16,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 4,
+    overflow: 'hidden',
   },
-  crecheHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    flex: 1,
-  },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: '#f0f0f0',
-  },
-  registeredIcon: {
-    width: 50,
-    height: 50,
-    marginLeft: 8,
-  },
-  infoContainer: {
-    marginVertical: 8,
+  mainImage: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
   },
   priceContainer: {
-    marginBottom: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#f9f9f9',
   },
   price: {
-    fontSize: 14,
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#333',
   },
-  infoItem: {
+  availability: {
+    fontSize: 14,
+    color: '#28a745',
+    fontWeight: 'bold',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
+  locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    paddingHorizontal: 16,
+    marginTop: 8,
   },
-  infoText: {
+  locationText: {
     fontSize: 14,
+    color: '#666',
     marginLeft: 8,
   },
+  distanceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
+  distanceText: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 8,
+  },
+  registeredIcon: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    width: 50,
+    height: 50,
+  },
   detailsButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#bd84f6',
     borderRadius: 5,
     padding: 10,
     alignItems: 'center',
-    marginTop: 12,
+    margin: 16,
   },
   detailsButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

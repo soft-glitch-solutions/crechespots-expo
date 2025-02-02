@@ -1,149 +1,195 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal, Button } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // Ensure correct import path
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import supabase from '../../supabaseClient';
 
-const getTypeColor = (type) => {
-  switch (type) {
-    case 'Events':
-      return '#f68484'; // Light red for Events
-    case 'Helpful':
-      return '#f6cc84'; // Light green for Helpful
-    case 'Donation':
-      return '#84a7f6'; // Light blue for Donation
-    default:
-      return '#ffffff'; // Default background color
+const MyChild = ({ navigation }) => {
+  const [students, setStudents] = useState([]);
+  const [creches, setCreches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchStudentsAndCreches();
+  }, []);
+
+  const fetchStudentsAndCreches = async () => {
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: studentData, error: studentError } = await supabase
+          .from('students')
+          .select('*')
+          .eq('user_id', user.id);
+
+        if (studentError) {
+          throw studentError;
+        }
+
+        setStudents(studentData);
+
+        const { data: crecheData, error: crecheError } = await supabase
+          .from('creches')
+          .select('*');
+
+        if (crecheError) {
+          throw crecheError;
+        }
+
+        setCreches(crecheData);
+      } else {
+        Alert.alert('Error', 'Unable to fetch user information');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Error fetching students and creches');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#4a90e2" style={styles.loadingIndicator} />;
   }
-};
 
-const ArticleItem = ({ article, isHearted, onHeart, onSave, onReport }) => {
-  const typeColor = getTypeColor(article.type);
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  if (students.length === 0) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.noStudentsText}>Hi there, it seems you are not part of any creche or student groups.</Text>
+        <Text style={styles.noStudentsText}>Maybe try applying to a creche or check your existing applications.</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Apply')}>
+            <Text style={styles.buttonText}>Apply to a Creche</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Applications')}>
+            <Text style={styles.buttonText}>Check Applications</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
-  const handleSave = () => {
-    setIsSaved(!isSaved);
-    onSave(article.id, !isSaved);
-    setIsMenuVisible(false); // Close the menu after saving
-  };
-
-  const handleReport = () => {
-    onReport(article.id);
-    setIsMenuVisible(false); // Close the menu after reporting
-  };
+  const crecheMap = creches.reduce((acc, creche) => {
+    acc[creche.id] = creche.name;
+    return acc;
+  }, {});
 
   return (
-    <View style={[styles.article, { backgroundColor: typeColor }]}>
-      <View style={styles.header}>
-        <Text style={styles.articleAuthor}>{article.author.display_name}</Text>
-        <Text style={styles.articleTime}>{article.time}</Text>
-        <TouchableOpacity onPress={() => setIsMenuVisible(true)}>
-          <Icon name="dots-vertical" size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.articleTitle}>{article.title}</Text>
-      <Text style={styles.articleContent}>{article.content}</Text>
-      <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Icon name="heart" size={16} color="#ff0000" />
-          <Text style={styles.statText}>{article.hearts || 0}</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Icon name="comment" size={16} color="#0000ff" />
-          <Text style={styles.statText}>{article.comments || 0}</Text>
-        </View>
-        <View style={styles.statItem}>
-          <Icon name="share" size={16} color="#00ff00" />
-          <Text style={styles.statText}>{article.shares || 0}</Text>
-        </View>
-      </View>
-
-      {/* Three-dot menu modal */}
-      <Modal visible={isMenuVisible} transparent={true} animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.menuContainer}>
-            <TouchableOpacity style={styles.menuItem} onPress={handleSave}>
-              <Text>{isSaved ? 'Unsave Post' : 'Save Post'}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={handleReport}>
-              <Text>Report Post</Text>
-            </TouchableOpacity>
-            <Button title="Close" onPress={() => setIsMenuVisible(false)} />
+    <View style={styles.container}>
+      <Text style={styles.title}>My Children</Text>
+      <FlatList
+        data={students}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.profileCard}>
+            <Image
+              source={{ uri: item.profile_picture || 'https://via.placeholder.com/100' }}
+              style={styles.profileImage}
+            />
+            <View style={styles.profileDetails}>
+              <Text style={styles.studentName}>{item.name}</Text>
+              <Text style={styles.crecheName}>{crecheMap[item.creche_id] || 'Unknown Creche'}</Text>
+              <Text style={styles.studentDetails}>Fees Owed: ${item.fees_owed}</Text>
+              <Text style={styles.studentDetails}>Fees Paid: ${item.fees_paid}</Text>
+              <TouchableOpacity
+                style={styles.detailsButton}
+                onPress={() => navigation.navigate('MyCentreDetails', { studentId: item.id })}
+              >
+                <Text style={styles.detailsButtonText}>View Details</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        )}
+      />
     </View>
   );
 };
 
+export default MyChild;
+
 const styles = StyleSheet.create({
-  article: {
+  container: {
+    flex: 1,
     padding: 16,
-    borderRadius: 10,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 4,
-    marginBottom: 16,
-    marginHorizontal: 16,
+    backgroundColor: '#f0f4f7',
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  articleAuthor: {
-    fontSize: 16,
+  title: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#333333',
+    color: '#333',
+    marginBottom: 16,
+    textAlign: 'center',
   },
-  articleTime: {
-    fontSize: 14,
-    color: '#555555',
-  },
-  articleTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#333333',
-    marginBottom: 8,
-  },
-  articleContent: {
-    fontSize: 16,
-    color: '#ffffff',
-    marginBottom: 12,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 12,
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statText: {
-    fontSize: 14,
-    color: '#333333',
-    marginLeft: 4,
-  },
-  modalOverlay: {
+  loadingIndicator: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  menuContainer: {
+  profileCard: {
+    flexDirection: 'row',
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 16,
-    width: '80%',
+    marginBottom: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  menuItem: {
+  profileImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginRight: 16,
+  },
+  profileDetails: {
+    flex: 1,
+  },
+  studentName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#222',
+  },
+  crecheName: {
+    fontSize: 16,
+    color: '#4a90e2',
+    marginBottom: 4,
+  },
+  studentDetails: {
+    fontSize: 14,
+    color: '#666',
+  },
+  detailsButton: {
+    marginTop: 10,
+    backgroundColor: '#4a90e2',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+  },
+  detailsButtonText: {
+    color: '#fff',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  noStudentsText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#555',
+    fontSize: 18,
+  },
+  buttonContainer: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  button: {
+    backgroundColor: '#4a90e2',
+    borderRadius: 8,
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    paddingHorizontal: 20,
+    marginVertical: 5,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
-
-export default ArticleItem;

@@ -8,7 +8,6 @@ import YourApplications from '../screens/YourApplications';
 import NotificationsScreen from '../screens/Notifications';
 import Transport from '../screens/Transport';
 import FeedsList from '../screens/FeedsList';
-import MyCentre from '../screens/MyCentre';
 import supabase from '../supabaseClient';  // Import your supabase client
 
 // Import your images
@@ -17,6 +16,7 @@ import ExploreIcon from '../assets/images/magnifier.png'; // Replace with your i
 import MyCentresIcon from '../assets/images/children.png'; // Replace with your image path
 import NotificationsIcon from '../assets/images/notification.png'; // Replace with your image path
 import TransportIcon from '../assets/images/transport.png'; // Replace with your image path
+import MyChild from '../screens/MyChild';
 
 const Tab = createBottomTabNavigator();
 
@@ -115,14 +115,14 @@ const HomeTabs = () => {
         tabBarLabelStyle: {
           fontSize: 12,
         },
-        tabBarActiveTintColor: 'tomato',
+        tabBarActiveTintColor: '#bd84f6',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
       })}
     >
       <Tab.Screen name="FeedsList" component={FeedsList} options={{ tabBarLabel: 'Home' }} />
       <Tab.Screen name="CrecheList" component={CrecheList} options={{ tabBarLabel: 'Explore' }} />
-      <Tab.Screen name="MyCentre" component={MyCentre} options={{ tabBarLabel: 'My Child' }} />
+      <Tab.Screen name="MyCentre" component={MyChild} options={{ tabBarLabel: 'MyChild' }} />
       <Tab.Screen name="Notifications" component={NotificationsScreen} options={{ tabBarLabel: 'Notifications' }} />
       <Tab.Screen name="Transport" component={Transport} options={{ tabBarLabel: 'Transport' }} />
     </Tab.Navigator>

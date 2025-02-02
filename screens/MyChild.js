@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Alert, StyleSheet, TouchableOpacity } from 'react-native';
 import supabase from '../supabaseClient';
 
-const MyCentre = ({ navigation }) => {
+const MyChild = ({ navigation }) => {
   const [students, setStudents] = useState([]);
   const [creches, setCreches] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +83,7 @@ const MyCentre = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Centre</Text>
+      <Text style={styles.title}>My Child</Text>
       <FlatList
         data={students}
         keyExtractor={(item) => item.id.toString()}
@@ -106,7 +106,7 @@ const MyCentre = ({ navigation }) => {
   );
 };
 
-export default MyCentre;
+export default MyChild;
 
 const styles = StyleSheet.create({
   container: {
