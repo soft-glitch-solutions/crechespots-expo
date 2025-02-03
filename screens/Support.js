@@ -10,7 +10,7 @@ const Support = () => {
   const [message, setMessage] = useState('');
   const [isNotificationVisible, setIsNotificationVisible] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
-  
+  const [localContent, setLocalContent] = useState("");
   const slideAnim = useState(new Animated.Value(-100))[0]; // Initial position of the notification
 
   const handleSubmit = async () => {

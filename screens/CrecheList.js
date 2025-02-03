@@ -109,6 +109,7 @@ const CrecheList = () => {
     fetchLocation();
   }, []);
 
+
   useEffect(() => {
     const fetchCreches = async () => {
       try {
@@ -161,6 +162,24 @@ const CrecheList = () => {
     }
   }, [searchQuery, creches, userLocation]);
 
+  const fetchGalleryImages = async (crecheId) => {
+    try {
+      const { data, error } = await supabase
+        .from('creche_gallary') // Ensure this matches your database table name
+        .select('image_url')
+        .eq('creche_id', crecheId);
+  
+      if (error) {
+        throw error;
+      }
+  
+      return data || []; // Return an empty array if no images found
+    } catch (error) {
+      console.error('Error fetching gallery images:', error.message);
+      return [];
+    }
+  };
+  
   const handleSelectCreche = (crecheId) => {
     navigation.navigate('CrecheDetails', { crecheId });
   };
@@ -197,6 +216,7 @@ const CrecheList = () => {
               <CrecheItem
                 creche={item}
                 onSelectCreche={handleSelectCreche}
+                fetchGalleryImages={fetchGalleryImages} // Pass the function here
               />
             )}
           />

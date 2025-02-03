@@ -1,195 +1,176 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import supabase from '../../supabaseClient';
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
-const MyChild = ({ navigation }) => {
-  const [students, setStudents] = useState([]);
-  const [creches, setCreches] = useState([]);
-  const [loading, setLoading] = useState(true);
+const getTypeColor = (type) => {
+  switch (type) {
+    case 'Events':
+      return '#f68484';
+    case 'Helpful':
+      return '#f6cc84';
+    case 'Donation':
+      return '#84a7f6';
+    default:
+      return '#ffffff';
+  }
+};
 
-  useEffect(() => {
-    fetchStudentsAndCreches();
-  }, []);
+const ArticleItem = ({ article, onHeart, onSave, onReport }) => {
+  const typeColor = getTypeColor(article.type);
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
+  const [isHearted, setIsHearted] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
 
-  const fetchStudentsAndCreches = async () => {
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: studentData, error: studentError } = await supabase
-          .from('students')
-          .select('*')
-          .eq('user_id', user.id);
-
-        if (studentError) {
-          throw studentError;
-        }
-
-        setStudents(studentData);
-
-        const { data: crecheData, error: crecheError } = await supabase
-          .from('creches')
-          .select('*');
-
-        if (crecheError) {
-          throw crecheError;
-        }
-
-        setCreches(crecheData);
-      } else {
-        Alert.alert('Error', 'Unable to fetch user information');
-      }
-    } catch (error) {
-      Alert.alert('Error', error.message || 'Error fetching students and creches');
-    } finally {
-      setLoading(false);
-    }
+  const handleHeart = () => {
+    setIsHearted(!isHearted);
+    onHeart(article.id, !isHearted);
   };
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#4a90e2" style={styles.loadingIndicator} />;
-  }
+  const handleSave = () => {
+    setIsSaved(!isSaved);
+    onSave(article.id, !isSaved);
+    setIsMenuVisible(false);
+  };
 
-  if (students.length === 0) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.noStudentsText}>Hi there, it seems you are not part of any creche or student groups.</Text>
-        <Text style={styles.noStudentsText}>Maybe try applying to a creche or check your existing applications.</Text>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Apply')}>
-            <Text style={styles.buttonText}>Apply to a Creche</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Applications')}>
-            <Text style={styles.buttonText}>Check Applications</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  const crecheMap = creches.reduce((acc, creche) => {
-    acc[creche.id] = creche.name;
-    return acc;
-  }, {});
+  const handleReport = () => {
+    onReport(article.id);
+    setIsMenuVisible(false);
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Children</Text>
-      <FlatList
-        data={students}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.profileCard}>
-            <Image
-              source={{ uri: item.profile_picture || 'https://via.placeholder.com/100' }}
-              style={styles.profileImage}
-            />
-            <View style={styles.profileDetails}>
-              <Text style={styles.studentName}>{item.name}</Text>
-              <Text style={styles.crecheName}>{crecheMap[item.creche_id] || 'Unknown Creche'}</Text>
-              <Text style={styles.studentDetails}>Fees Owed: ${item.fees_owed}</Text>
-              <Text style={styles.studentDetails}>Fees Paid: ${item.fees_paid}</Text>
-              <TouchableOpacity
-                style={styles.detailsButton}
-                onPress={() => navigation.navigate('MyCentreDetails', { studentId: item.id })}
-              >
-                <Text style={styles.detailsButtonText}>View Details</Text>
+    <View style={[styles.article, { backgroundColor: typeColor }]}>      
+      <View style={styles.header}>
+        <Text style={styles.articleAuthor}>{article.author.display_name}</Text>
+        <Text style={styles.articleTime}>{article.time}</Text>
+        <View>
+          <TouchableOpacity onPress={() => setIsMenuVisible(!isMenuVisible)}>
+            <Text style={styles.menuDots}>⋮</Text>
+          </TouchableOpacity>
+          {isMenuVisible && (
+            <View style={styles.dropdownMenu}>
+              <TouchableOpacity style={styles.menuItem} onPress={handleSave}>
+                <Text>{isSaved ? 'Unsave Post' : 'Save Post'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuItem} onPress={handleReport}>
+                <Text>Report Post</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        )}
-      />
+          )}
+        </View>
+      </View>
+
+      <Text style={styles.articleTitle}>{article.title}</Text>
+      <Text style={styles.articleContent}>{article.content}</Text>
+
+      <View style={styles.statsContainer}>
+        <TouchableOpacity style={styles.statItem} onPress={handleHeart}>
+          <Image
+            source={isHearted ? require('../../assets/heart-filled.png') : require('../../assets/heart-outline.png')}
+            style={styles.icon}
+          />
+          <Text style={styles.statText}>{article.hearts + (isHearted ? 1 : 0)}</Text>
+        </TouchableOpacity>
+
+        <View style={styles.statItem}>
+          <Image
+            source={require('../../assets/custom-comment.png')}
+            style={styles.icon}
+          />
+          <Text style={styles.statText}>{article.comments || 0}</Text>
+        </View>
+
+        <TouchableOpacity style={styles.statItem} onPress={handleSave}>
+          <Image
+            source={isSaved ? require('../../assets/save-filled.png') : require('../../assets/save-outline.png')}
+            style={styles.icon}
+          />
+          <Text style={styles.statText}>{isSaved ? 'Saved' : 'Save'}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
-export default MyChild;
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  article: {
     padding: 16,
-    backgroundColor: '#f0f4f7',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  loadingIndicator: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  profileCard: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
+    borderRadius: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 8,
     elevation: 4,
+    marginBottom: 16,
+    marginHorizontal: 16,
   },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginRight: 16,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
   },
-  profileDetails: {
-    flex: 1,
-  },
-  studentName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#222',
-  },
-  crecheName: {
+  articleAuthor: {
     fontSize: 16,
-    color: '#4a90e2',
-    marginBottom: 4,
-  },
-  studentDetails: {
-    fontSize: 14,
-    color: '#666',
-  },
-  detailsButton: {
-    marginTop: 10,
-    backgroundColor: '#4a90e2',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
-  },
-  detailsButtonText: {
-    color: '#fff',
-    textAlign: 'center',
     fontWeight: 'bold',
+    color: '#333',
   },
-  noStudentsText: {
-    textAlign: 'center',
-    marginTop: 20,
+  articleTime: {
+    fontSize: 14,
     color: '#555',
-    fontSize: 18,
   },
-  buttonContainer: {
-    marginTop: 20,
+  menuDots: {
+    fontSize: 24,
+    color: '#333',
+    padding: 5,
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 30,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    zIndex: 1,
+  },
+  menuItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  articleTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#333',
+    marginBottom: 8,
+  },
+  articleContent: {
+    fontSize: 16,
+    color: '#fff',
+    marginBottom: 12,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 12,
+  },
+  statItem: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  button: {
-    backgroundColor: '#4a90e2',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    marginVertical: 5,
+  statText: {
+    fontSize: 14,
+    color: '#333',
+    marginLeft: 4,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+  icon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
   },
 });
+
+export default ArticleItem;

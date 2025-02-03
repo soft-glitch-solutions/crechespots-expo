@@ -9,7 +9,7 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons'; // For icons
+import { MaterialIcons, Entypo } from '@expo/vector-icons'; // For icons
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../supabaseClient';
 

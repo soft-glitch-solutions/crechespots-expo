@@ -1,17 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ActivityIndicator, Alert } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import supabase from '../supabaseClient';
 
 import HomeTabs from './HomeTabs';
 import Settings from '../screens/Settings';
-import Transport from '../screens/Transport';
-import News from '../screens/News';
-import Help from '../screens/Help'; 
-import Support from '../screens/Support'; 
-import Profile from '../screens/Profile'; 
 import YourApplications from '../screens/YourApplications';
-import ChatListScreen from '../screens/chat/ChatListScreen';
+import Help from '../screens/Help';
+import Support from '../screens/Support';
+import Profile from '../screens/Profile';
 import DeveloperScreen from '../screens/developer/DeveloperScreen';
 
 // Import your images
@@ -44,7 +41,7 @@ const DrawerNavigator = () => {
     id_number: '',
     profile_picture_url: '',
     bio: '',
-    role: ''
+    role: '',
   });
   const [loading, setLoading] = useState(false);
   const [isDeveloper, setIsDeveloper] = useState(false);
@@ -55,41 +52,46 @@ const DrawerNavigator = () => {
 
   const fetchProfile = async () => {
     setLoading(true);
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session) {
-      Alert.alert('Error', 'Unable to fetch user session');
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session) {
+        Alert.alert('Error', 'Unable to fetch user session');
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('users')
+        .select(`
+          display_name, email, first_name, last_name,
+          phone_number, id_number, profile_picture_url, bio, roles(role_name)
+        `)
+        .eq('id', session.user.id)
+        .single();
+
+      if (error) {
+        Alert.alert('Error', 'Error fetching profile data');
+        console.error('Profile Fetch Error:', error);
+      } else {
+        setProfile({
+          display_name: data.display_name,
+          email: data.email,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          phone_number: data.phone_number,
+          id_number: data.id_number,
+          profile_picture_url: data.profile_picture_url,
+          bio: data.bio,
+          role: data.roles.role_name,
+        });
+
+        setIsDeveloper(data.roles.role_name === 'Developer');
+      }
+    } catch (error) {
+      console.error('Unexpected Error:', error);
+      Alert.alert('Error', 'An unexpected error occurred');
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const { data, error } = await supabase
-      .from('users')
-      .select(`
-        display_name, email, first_name, last_name,
-        phone_number, id_number, profile_picture_url, bio, roles(role_name)
-      `)
-      .eq('id', session.user.id)
-      .single();
-
-    if (error) {
-      Alert.alert('Error', 'Error fetching profile data');
-      console.error('Profile Fetch Error:', error);
-    } else {
-      setProfile({
-        display_name: data.display_name,
-        email: data.email,
-        first_name: data.first_name,
-        last_name: data.last_name,
-        phone_number: data.phone_number,
-        id_number: data.id_number,
-        profile_picture_url: data.profile_picture_url,
-        bio: data.bio,
-        role: data.roles.role_name
-      });
-
-      setIsDeveloper(data.roles.role_name === 'Developer');
-    }
-    setLoading(false);
   };
 
   const CustomDrawerContent = (props) => {
@@ -114,11 +116,7 @@ const DrawerNavigator = () => {
             label="Home"
             icon={({ color, size }) => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Home }]}>
-                {loading ? (
-                  <View style={[styles.icon, styles.iconPlaceholder]} />
-                ) : (
-                  <Image source={homeIcon} style={styles.icon} />
-                )}
+                <Image source={homeIcon} style={styles.icon} />
               </View>
             )}
             onPress={() => props.navigation.navigate('Home')}
@@ -127,11 +125,7 @@ const DrawerNavigator = () => {
             label="Settings"
             icon={({ color, size }) => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Settings }]}>
-                {loading ? (
-                  <View style={[styles.icon, styles.iconPlaceholder]} />
-                ) : (
-                  <Image source={settingsIcon} style={styles.icon} />
-                )}
+                <Image source={settingsIcon} style={styles.icon} />
               </View>
             )}
             onPress={() => props.navigation.navigate('Settings')}
@@ -140,11 +134,7 @@ const DrawerNavigator = () => {
             label="My Applications"
             icon={({ color, size }) => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.MyApplications }]}>
-                {loading ? (
-                  <View style={[styles.icon, styles.iconPlaceholder]} />
-                ) : (
-                  <Image source={applicationsIcon} style={styles.icon} />
-                )}
+                <Image source={applicationsIcon} style={styles.icon} />
               </View>
             )}
             onPress={() => props.navigation.navigate('YourApplications')}
@@ -154,11 +144,7 @@ const DrawerNavigator = () => {
               label="Developer"
               icon={({ color, size }) => (
                 <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Developer }]}>
-                  {loading ? (
-                    <View style={[styles.icon, styles.iconPlaceholder]} />
-                  ) : (
-                    <Image source={developerIcon} style={styles.icon} />
-                  )}
+                  <Image source={developerIcon} style={styles.icon} />
                 </View>
               )}
               onPress={() => props.navigation.navigate('DeveloperScreen')}
@@ -171,11 +157,7 @@ const DrawerNavigator = () => {
             label="Help"
             icon={({ color, size }) => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Help }]}>
-                {loading ? (
-                  <View style={[styles.icon, styles.iconPlaceholder]} />
-                ) : (
-                  <Image source={helpIcon} style={styles.icon} />
-                )}
+                <Image source={helpIcon} style={styles.icon} />
               </View>
             )}
             onPress={() => props.navigation.navigate('Help')}
@@ -184,11 +166,7 @@ const DrawerNavigator = () => {
             label="Support"
             icon={({ color, size }) => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Support }]}>
-                {loading ? (
-                  <View style={[styles.icon, styles.iconPlaceholder]} />
-                ) : (
-                  <Image source={supportIcon} style={styles.icon} />
-                )}
+                <Image source={supportIcon} style={styles.icon} />
               </View>
             )}
             onPress={() => props.navigation.navigate('Support')}
@@ -201,50 +179,17 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
-      screenOptions={({ route }) => ({
-        drawerIcon: ({ color, size }) => {
-          let iconSource;
-
-          switch (route.name) {
-            case 'Home':
-              iconSource = homeIcon;
-              break;
-            case 'Settings':
-              iconSource = settingsIcon;
-              break;
-            case 'ChatListScreen':
-              iconSource = messagesIcon;
-              break;
-            case 'Help':
-              iconSource = helpIcon;
-              break;
-            case 'Support':
-              iconSource = supportIcon;
-              break;
-            case 'DeveloperScreen':
-              iconSource = developerIcon;
-              break;
-            default:
-              iconSource = helpIcon;
-          }
-
-          return loading ? (
-            <View style={[styles.icon, styles.iconPlaceholder]} />
-          ) : (
-            <Image source={iconSource} style={styles.icon} />
-          );
-        },
-      })}
+      screenOptions={{
+        headerShown: false,
+      }}
     >
-      <Drawer.Screen name="Home" component={HomeTabs} options={{ headerShown: false }} />
-      <Drawer.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
-      <Drawer.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
-      <Drawer.Screen name="Help" component={Help} options={{ headerShown: false }} />
-      <Drawer.Screen name="Support" component={Support} options={{ headerShown: false }} />
-      <Drawer.Screen name="YourApplications" component={YourApplications} options={{ headerShown: false }} />
-      {isDeveloper && (
-        <Drawer.Screen name="DeveloperScreen" component={DeveloperScreen} options={{ headerShown: false }} />
-      )}
+      <Drawer.Screen name="Home" component={HomeTabs} />
+      <Drawer.Screen name="Profile" component={Profile} />
+      <Drawer.Screen name="Settings" component={Settings} />
+      <Drawer.Screen name="YourApplications" component={YourApplications} />
+      <Drawer.Screen name="Help" component={Help} />
+      <Drawer.Screen name="Support" component={Support} />
+      {isDeveloper && <Drawer.Screen name="DeveloperScreen" component={DeveloperScreen} />}
     </Drawer.Navigator>
   );
 };
