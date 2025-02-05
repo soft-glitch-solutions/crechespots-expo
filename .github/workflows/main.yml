@@ -16,13 +16,15 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: '18'  # ✅ Upgrade to Node.js 18+ for ReadableStream support
 
       - name: Install dependencies
         run: npm install
 
       - name: Build the app
-        run: npx expo export -p web
+        run: |
+          npm install undici@5.22.1 --save-exact  # ✅ Downgrade undici if needed
+          npx expo export -p web
 
       - name: Deploy to cPanel via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
