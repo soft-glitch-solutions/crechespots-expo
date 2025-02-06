@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as Location from 'expo-location';
 import supabase from '../supabaseClient'; // Ensure the correct import path
@@ -7,11 +7,9 @@ import CrecheItem from '../component/Creches/CrecheItem';
 import SearchInput from '../component/Creches/SearchInput';
 import Loading from '../component/loadingComponent/loading';
 
-// Coordinates for Cape Town Central
 const CAPE_TOWN_CENTRAL = { latitude: -33.9249, longitude: 18.4241 };
 
-const placeholderImage = 'https://crechespots.org.za/wp-content/uploads/2024/08/recheSpot-1.gif'; // Placeholder image URL
-const registeredIcon = require('../assets/images/Registered.png'); // Ensure correct path to your asset
+const placeholderImage = 'https://crechespots.org.za/wp-content/uploads/2024/08/recheSpot-1.gif';
 
 const getDistance = (lat1, lon1, lat2, lon2) => {
   const toRad = (value) => (value * Math.PI) / 180;
@@ -36,13 +34,31 @@ const CrecheList = () => {
   const [roadName, setRoadName] = useState('');
   const navigation = useNavigation();
 
+  // Fetching the gallery images
+  const fetchGalleryImages = async (crecheId) => {
+    try {
+      const { data, error } = await supabase
+        .from('creche_gallery') // Ensure this matches your database table name
+        .select('image_url')
+        .eq('creche_id', crecheId);
+
+      if (error) {
+        throw error;
+      }
+
+      return data.map((item) => item.image_url); // Return an array of image URLs
+    } catch (error) {
+      console.error('Error fetching gallery images:', error.message);
+      return [];
+    }
+  };
+
   useEffect(() => {
     const fetchLocation = async () => {
       try {
         let location;
 
         if (Platform.OS === 'web') {
-          // Web platform
           if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
               async (position) => {
@@ -66,17 +82,16 @@ const CrecheList = () => {
                 }
               },
               (error) => {
-                setUserLocation(CAPE_TOWN_CENTRAL); // Set default location
+                setUserLocation(CAPE_TOWN_CENTRAL);
                 setRoadName('Cape Town Central');
               }
             );
           } else {
             setError('Geolocation is not supported by this browser.');
-            setUserLocation(CAPE_TOWN_CENTRAL); // Set default location
+            setUserLocation(CAPE_TOWN_CENTRAL);
             setRoadName('Cape Town Central');
           }
         } else {
-          // React Native platform
           let { status } = await Location.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
             throw new Error('Location permission not granted');
@@ -94,14 +109,14 @@ const CrecheList = () => {
           } catch (locationError) {
             setError(`Error fetching location: ${locationError.message}`);
             console.error('Error fetching location:', locationError.message);
-            setUserLocation(CAPE_TOWN_CENTRAL); // Set default location
+            setUserLocation(CAPE_TOWN_CENTRAL);
             setRoadName('Cape Town Central');
           }
         }
       } catch (generalError) {
         setError(`General error: ${generalError.message}`);
         console.error('General error:', generalError.message);
-        setUserLocation(CAPE_TOWN_CENTRAL); // Set default location
+        setUserLocation(CAPE_TOWN_CENTRAL);
         setRoadName('Cape Town Central');
       }
     };
@@ -112,10 +127,6 @@ const CrecheList = () => {
   useEffect(() => {
     const fetchCreches = async () => {
       try {
-        if (!supabase) {
-          throw new Error('Supabase client is not initialized.');
-        }
-
         const { data, error } = await supabase
           .from('creches')
           .select('id, name, address, phone_number, capacity, logo, latitude, longitude, registered, monthly_price, weekly_price');
@@ -124,8 +135,14 @@ const CrecheList = () => {
           throw error;
         }
 
-        setCreches(data);
-        setFilteredCreches(data);
+        // Fetch gallery images for each creche
+        const crechesWithGallery = await Promise.all(data.map(async (creche) => {
+          const galleryImages = await fetchGalleryImages(creche.id);
+          return { ...creche, gallery: galleryImages };
+        }));
+
+        setCreches(crechesWithGallery);
+        setFilteredCreches(crechesWithGallery);
         setLoading(false);
       } catch (error) {
         setError(`Error fetching creches: ${error.message}`);
@@ -160,24 +177,6 @@ const CrecheList = () => {
       setFilteredCreches(filtered);
     }
   }, [searchQuery, creches, userLocation]);
-
-  const fetchGalleryImages = async (crecheId) => {
-    try {
-      const { data, error } = await supabase
-        .from('creche_gallery') // Ensure this matches your database table name
-        .select('image_url')
-        .eq('creche_id', crecheId);
-
-      if (error) {
-        throw error;
-      }
-
-      return data || []; // Return an empty array if no images found
-    } catch (error) {
-      console.error('Error fetching gallery images:', error.message);
-      return [];
-    }
-  };
 
   const handleSelectCreche = (crecheId) => {
     navigation.navigate('CrecheDetails', { crecheId });
@@ -215,7 +214,6 @@ const CrecheList = () => {
               <CrecheItem
                 creche={item}
                 onSelectCreche={handleSelectCreche}
-                fetchGalleryImages={fetchGalleryImages} // Pass the function here
               />
             )}
           />
