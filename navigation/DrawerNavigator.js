@@ -97,19 +97,6 @@ const DrawerNavigator = () => {
   const CustomDrawerContent = (props) => {
     return (
       <DrawerContentScrollView {...props} contentContainerStyle={{ flex: 1 }}>
-        <View style={styles.profileContainer}>
-          {loading ? (
-            <View style={[styles.profileImage, styles.imagePlaceholder]}>
-              <ActivityIndicator size="small" color="#4a90e2" />
-            </View>
-          ) : (
-            <Image
-              source={profile.profile_picture_url ? { uri: profile.profile_picture_url } : require('../assets/default-profile.png')}
-              style={styles.profileImage}
-            />
-          )}
-          <Text style={styles.profileName}>{profile.display_name || 'Loading...'}</Text>
-        </View>
 
         <View style={styles.drawerItemsContainer}>
           <DrawerItem
