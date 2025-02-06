@@ -35,7 +35,7 @@ const LessonsDetails = ({ route, navigation }) => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#4a90e2" style={styles.loader} />;
+    return <ActivityIndicator size="large" color="#bd84f6" style={styles.loader} />;
   }
 
   // Get the current week (from Monday to Sunday)
@@ -62,7 +62,7 @@ const LessonsDetails = ({ route, navigation }) => {
         onPress={() => navigation.goBack()}
         style={styles.backButton}
       >
-        <Icon name="arrow-left" size={20} color="#4a90e2" />
+        <Icon name="arrow-left" size={20} color="#bd84f6" />
       </TouchableOpacity>
       <Text style={styles.title}>Lesson Plan for the Week</Text>
 
@@ -72,20 +72,20 @@ const LessonsDetails = ({ route, navigation }) => {
         minDate={startOfWeek}
         maxDate={endOfWeek}
         markedDates={Object.keys(eventsByDay).reduce((acc, date) => {
-          acc[date] = { marked: true, dotColor: '#4a90e2' };
+          acc[date] = { marked: true, dotColor: '#bd84f6' };
           return acc;
         }, {})}
         markingType="dot"
         theme={{
           calendarBackground: '#fff',
           textSectionTitleColor: '#b6c1cd',
-          selectedDayBackgroundColor: '#4a90e2',
+          selectedDayBackgroundColor: '#bd84f6',
           selectedDayTextColor: '#ffffff',
-          todayTextColor: '#4a90e2',
+          todayTextColor: '#bd84f6',
           dayTextColor: '#2d4150',
-          arrowColor: '#4a90e2',
-          monthTextColor: '#4a90e2',
-          indicatorColor: '#4a90e2',
+          arrowColor: '#bd84f6',
+          monthTextColor: '#bd84f6',
+          indicatorColor: '#bd84f6',
         }}
       />
 

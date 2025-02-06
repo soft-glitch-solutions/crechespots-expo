@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   header: {
     padding: 16,
     paddingTop: 50,
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   sent: {
     alignSelf: 'flex-end',
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
   },
   received: {
     alignSelf: 'flex-start',
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   sendButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     padding: 10,
     borderRadius: 5,
   },

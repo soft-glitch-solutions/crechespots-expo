@@ -27,11 +27,11 @@ const Settings = () => {
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
-          <Icon name="user" size={20} color="#4a90e2" />
+          <Icon name="user" size={20} color="#bd84f6" />
           <Text style={styles.optionText}>Edit Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('ChangePassword')}>
-          <Icon name="lock" size={20} color="#4a90e2" />
+          <Icon name="lock" size={20} color="#bd84f6" />
           <Text style={styles.optionText}>Change Password</Text>
         </TouchableOpacity>
       </ScrollView>

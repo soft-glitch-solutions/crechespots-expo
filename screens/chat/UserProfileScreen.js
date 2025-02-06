@@ -33,7 +33,7 @@ const UserProfileScreen = () => {
   if (!user) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator size="large" color="#4a90e2" />
+        <ActivityIndicator size="large" color="#bd84f6" />
       </View>
     );
   }
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 10,

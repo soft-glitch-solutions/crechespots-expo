@@ -88,7 +88,7 @@ const ApplicationDetails = () => {
   // Render item for FlatList
   const renderItem = ({ item }) => (
     <View style={styles.infoRow}>
-      <Icon name={item.icon} size={24} color="#4a90e2" />
+      <Icon name={item.icon} size={24} color="#bd84f6" />
       <View style={styles.infoTextContainer}>
         <Text style={styles.label}>{item.label}</Text>
         <Text style={styles.value}>{item.value}</Text>
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     padding: 16,
     elevation: 4,
   },
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   editButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     borderRadius: 25,
     padding: 12,
   },

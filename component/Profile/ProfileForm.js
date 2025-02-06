@@ -22,7 +22,7 @@ const ProfileForm = ({ profile, onChange }) => {
   return (
     <>
       <View style={styles.inputContainer}>
-        <Icon name="user" size={20} color="#4a90e2" style={styles.icon} />
+        <Icon name="user" size={20} color="#bd84f6" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Name"
@@ -32,7 +32,7 @@ const ProfileForm = ({ profile, onChange }) => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Icon name="envelope" size={20} color="#4a90e2" style={styles.icon} />
+        <Icon name="envelope" size={20} color="#bd84f6" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -42,7 +42,7 @@ const ProfileForm = ({ profile, onChange }) => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Icon name="id-card" size={20} color="#4a90e2" style={styles.icon} />
+        <Icon name="id-card" size={20} color="#bd84f6" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="ID Number"
@@ -52,7 +52,7 @@ const ProfileForm = ({ profile, onChange }) => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Icon name="map-marker" size={20} color="#4a90e2" style={styles.icon} />
+        <Icon name="map-marker" size={20} color="#bd84f6" style={styles.icon} />
         <Picker
           style={styles.picker}
           selectedValue={safeProfile.province || ''}
@@ -66,7 +66,7 @@ const ProfileForm = ({ profile, onChange }) => {
         </Picker>
       </View>
       <View style={styles.inputContainer}>
-        <Icon name="map-marker" size={20} color="#4a90e2" style={styles.icon} />
+        <Icon name="map-marker" size={20} color="#bd84f6" style={styles.icon} />
         <TextInput
           style={styles.input}
           placeholder="City"
@@ -76,7 +76,7 @@ const ProfileForm = ({ profile, onChange }) => {
         />
       </View>
       <View style={styles.inputContainer}>
-        <Icon name="info-circle" size={20} color="#4a90e2" style={styles.icon} />
+        <Icon name="info-circle" size={20} color="#bd84f6" style={styles.icon} />
         <TextInput
           style={styles.bioInput}
           placeholder="Bio"

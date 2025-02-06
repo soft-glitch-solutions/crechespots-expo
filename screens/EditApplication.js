@@ -192,7 +192,7 @@ const EditApplication = () => {
           </View>
         </View>
         <View style={styles.buttonContainer}>
-          <Button title="Save Changes" onPress={handleSave} color="#4a90e2" />
+          <Button title="Save Changes" onPress={handleSave} color="#bd84f6" />
         </View>
       </ScrollView>
       <View style={styles.backButtonContainer}>
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   backButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     borderRadius: 25,
     padding: 12,
     justifyContent: 'center',

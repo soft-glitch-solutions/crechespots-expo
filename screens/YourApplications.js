@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   viewButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     padding: 10,
     borderRadius: 5,
     marginRight: 10,

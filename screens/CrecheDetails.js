@@ -94,7 +94,7 @@ const CrecheDetails = () => {
     if (!value) return null;
     return (
       <View style={styles.infoRow}>
-        <Icon name={iconName} size={24} color="#4a90e2" />
+        <Icon name={iconName} size={24} color="#bd84f6" />
         <Text style={styles.infoLabel}>{label}</Text>
         {isLink ? (
           <TouchableOpacity onPress={() => onPress(value)}>
@@ -119,7 +119,7 @@ const CrecheDetails = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Icon name="arrow-back" size={30} color="#4a90e2" />
+        <Icon name="arrow-back" size={30} color="#bd84f6" />
       </TouchableOpacity>
 
       {crecheGalleryImages.length > 0 ? (
@@ -142,11 +142,11 @@ const CrecheDetails = () => {
         renderTabBar={(props) => (
           <TabBar
             {...props}
-            indicatorStyle={{ backgroundColor: '#4a90e2' }} // Indicator color
+            indicatorStyle={{ backgroundColor: '#bd84f6' }} // Indicator color
             style={{ backgroundColor: '#9b87f5' }} // Tab background color
             labelStyle={{ color: '#333', fontWeight: 'bold', fontSize: 14 }} // Tab title text style
             renderIcon={({ route }) => (
-              <MaterialCommunityIcons name={route.icon} size={20} color="#4a90e2" />
+              <MaterialCommunityIcons name={route.icon} size={20} color="#bd84f6" />
             )}
           />
         )}
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   applyButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 5,

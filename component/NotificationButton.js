@@ -9,7 +9,7 @@ const NotificationButton = () => {
   const [notificationCount, setNotificationCount] = useState(0);
 
   const handleGoToNotifications = () => {
-    navigation.navigate('NotificationsScreen');
+    navigation.navigate('Notifications');
   };
 
   useEffect(() => {

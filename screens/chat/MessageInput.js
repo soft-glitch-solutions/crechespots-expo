@@ -12,7 +12,7 @@ const MessageInput = ({ messageText, onChangeText, onSend }) => {
         placeholder="Type a message"
       />
       <TouchableOpacity onPress={onSend}>
-        <Icon name="send-outline" size={24} color="#4a90e2" />
+        <Icon name="send-outline" size={24} color="#bd84f6" />
       </TouchableOpacity>
     </View>
   );

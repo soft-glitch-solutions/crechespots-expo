@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   imagePickerButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     padding: 10,
     borderRadius: 8,
     marginBottom: 10,

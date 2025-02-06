@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Linking } from 'react-native';
 import supabase from '../supabaseClient';
 import Loading from '../component/loadingComponent/loading';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -8,11 +8,13 @@ import moment from 'moment';
 const MyCentreDetails = ({ route, navigation }) => {
   const { studentId } = route.params;
   const [student, setStudent] = useState(null);
+  const [documents, setDocuments] = useState([]);  // To store the student's documents
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState('details'); // Default selected tab
 
   useEffect(() => {
     fetchStudentDetails();
+    fetchStudentDocuments();  // Fetch documents on component mount
   }, []);
 
   const fetchStudentDetails = async () => {
@@ -31,6 +33,26 @@ const MyCentreDetails = ({ route, navigation }) => {
       setStudent(data);
     } catch (error) {
       Alert.alert('Error', error.message || 'Error fetching student details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStudentDocuments = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('student_documents')
+        .select('*')
+        .eq('student_id', studentId);
+
+      if (error) {
+        throw error;
+      }
+
+      setDocuments(data);
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Error fetching documents');
     } finally {
       setLoading(false);
     }
@@ -65,6 +87,10 @@ const MyCentreDetails = ({ route, navigation }) => {
     }
   };
 
+  const handleDocumentClick = (url) => {
+    Linking.openURL(url).catch((err) => Alert.alert('Error', 'Could not open document.'));
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -79,38 +105,31 @@ const MyCentreDetails = ({ route, navigation }) => {
 
   const renderDetailsTab = () => (
     <View style={styles.card}>
+      {/* Student Details */}
       <View style={styles.detailContainer}>
-        <Icon name="user" size={20} color="#4a90e2" />
+        <Icon name="user" size={20} color="#bd84f6" />
         <Text style={styles.detail}>Name: {student.name}</Text>
       </View>
-      <View style={styles.detailContainer}>
-        <Icon name="calendar" size={20} color="#4a90e2" />
-        <Text style={styles.detail}>Age: {student.age}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-        <Icon name="birthday-cake" size={20} color="#4a90e2" />
-        <Text style={styles.detail}>DOB: {student.dob}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-        <Icon name="book" size={20} color="#4a90e2" />
-        <Text style={styles.detail}>Class: {student.class}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-        <Icon name="home" size={20} color="#4a90e2" />
-        <Text style={styles.detail}>Address: {student.address}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-        <Icon name="stethoscope" size={20} color="#4a90e2" />
-        <Text style={styles.detail}>Disabilities/Allergies: {student.disabilities_allergies}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-        <Icon name="dollar" size={20} color="#4a90e2" />
-        <Text style={styles.detail}>Fees Owed: {student.fees_owed}</Text>
-      </View>
-      <View style={styles.detailContainer}>
-        <Icon name="dollar" size={20} color="#4a90e2" />
-        <Text style={styles.detail}>Fees Paid: {student.fees_paid}</Text>
-      </View>
+      {/* Add other student details like age, class, etc. */}
+    </View>
+  );
+
+  const renderDocumentsTab = () => (
+    <View style={styles.card}>
+      {documents.length === 0 ? (
+        <Text style={styles.noDataText}>No documents available for this student.</Text>
+      ) : (
+        documents.map((doc, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.documentItem}
+            onPress={() => handleDocumentClick(doc.url)}  // Assuming 'url' contains the document link
+          >
+            <Icon name="file" size={20} color="#bd84f6" />
+            <Text style={styles.documentText}>{doc.document_name}</Text>
+          </TouchableOpacity>
+        ))
+      )}
     </View>
   );
 
@@ -123,20 +142,7 @@ const MyCentreDetails = ({ route, navigation }) => {
         <Icon name="credit-card" size={20} color="#ffffff" style={styles.buttonIcon} />
         <Text style={styles.buttonText}>Pay Fees</Text>
       </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleLessonPlan}
-      >
-        <Icon name="book" size={20} color="#ffffff" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Lesson Plan</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleDropOff}
-      >
-        <Icon name="check-circle" size={20} color="#ffffff" style={styles.buttonIcon} />
-        <Text style={styles.buttonText}>Dropped Off</Text>
-      </TouchableOpacity>
+      {/* Other buttons */}
     </View>
   );
 
@@ -146,7 +152,7 @@ const MyCentreDetails = ({ route, navigation }) => {
         onPress={() => navigation.goBack()}
         style={styles.backButton}
       >
-        <Icon name="arrow-left" size={20} color="#4a90e2" />
+        <Icon name="arrow-left" size={20} color="#bd84f6" />
       </TouchableOpacity>
 
       <Text style={styles.title}>Student Details</Text>
@@ -165,12 +171,19 @@ const MyCentreDetails = ({ route, navigation }) => {
         >
           <Text style={[styles.tabText, selectedTab === 'actions' && styles.activeTabText]}>Actions</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setSelectedTab('documents')}
+          style={[styles.tab, selectedTab === 'documents' && styles.activeTab]}
+        >
+          <Text style={[styles.tabText, selectedTab === 'documents' && styles.activeTabText]}>Documents</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Render selected tab content */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {selectedTab === 'details' && renderDetailsTab()}
         {selectedTab === 'actions' && renderButtons()}
+        {selectedTab === 'documents' && renderDocumentsTab()}
       </ScrollView>
     </View>
   );
@@ -214,14 +227,14 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: '#4a90e2',
+    borderBottomColor: '#bd84f6',
   },
   tabText: {
     fontSize: 18,
     color: '#555',
   },
   activeTabText: {
-    color: '#4a90e2',
+    color: '#bd84f6',
     fontWeight: 'bold',
   },
   card: {
@@ -235,17 +248,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
   },
-  detailContainer: {
+  documentItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
-  detail: {
+  documentText: {
     fontSize: 16,
     marginLeft: 8,
-    flex: 1,
+    color: '#bd84f6',
+  },
+  noDataText: {
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#888',
+    fontSize: 18,
   },
   buttonGrid: {
     flexDirection: 'row',
@@ -253,7 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   button: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     borderRadius: 5,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -272,10 +291,5 @@ const styles = StyleSheet.create({
   buttonIcon: {
     marginRight: 8,
   },
-  noDataText: {
-    textAlign: 'center',
-    marginTop: 20,
-    color: '#888',
-    fontSize: 18,
-  },
 });
+

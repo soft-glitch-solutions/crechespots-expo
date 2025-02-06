@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
     left: -50,
     width: 200,
     height: 200,
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     borderRadius: 100,
     opacity: 0.1,
   },
@@ -254,12 +254,12 @@ const styles = StyleSheet.create({
   },
   forgotPasswordText: {
     fontSize: 16,
-    color: '#4a90e2',
+    color: '#bd84f6',
     textAlign: 'center',
     marginTop: 10,
   },
   button: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     borderRadius: 10,
     paddingVertical: 14,
     paddingHorizontal: 20,
@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   signUpLink: {
-    color: '#4a90e2',
+    color: '#bd84f6',
     fontWeight: 'bold',
   },
 });

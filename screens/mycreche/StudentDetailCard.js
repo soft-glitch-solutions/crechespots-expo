@@ -10,7 +10,7 @@ const StudentDetailCard = ({ student }) => {
     <Tab.Navigator
       initialRouteName="Overview"
       screenOptions={{
-        tabBarActiveTintColor: '#4a90e2',
+        tabBarActiveTintColor: '#bd84f6',
         tabBarStyle: { backgroundColor: '#fff' },
         headerShown: false,
       }}
@@ -59,7 +59,7 @@ const Details = ({ student }) => (
 
 const DetailRow = ({ icon, label, value }) => (
   <View style={styles.detailContainer}>
-    <Icon name={icon} size={20} color="#4a90e2" />
+    <Icon name={icon} size={20} color="#bd84f6" />
     <Text style={styles.detail}>{label}: {value}</Text>
   </View>
 );

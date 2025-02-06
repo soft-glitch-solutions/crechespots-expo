@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   exploreButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     padding: 10,
     borderRadius: 5,
     marginTop: 20,

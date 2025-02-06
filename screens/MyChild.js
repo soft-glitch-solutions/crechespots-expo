@@ -55,7 +55,7 @@ const MyChild = ({ navigation }) => {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#4a90e2" style={styles.loadingIndicator} />;
+    return <ActivityIndicator size="large" color="#bd84f6" style={styles.loadingIndicator} />;
   }
 
   if (students.length === 0) {
@@ -111,7 +111,7 @@ const MyChild = ({ navigation }) => {
 
       {/* Add child button */}
       <TouchableOpacity style={styles.addButton} onPress={() => setShowModal(true)}>
-        <Ionicons name="add-circle" size={60} color="#4a90e2" />
+        <Ionicons name="add-circle" size={60} color="#bd84f6" />
       </TouchableOpacity>
 
       {/* Modal to add new child */}
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   },
   crecheName: {
     fontSize: 16,
-    color: '#4a90e2',
+    color: '#bd84f6',
     marginBottom: 4,
   },
   studentDetails: {
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   detailsButton: {
     marginTop: 10,
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 6,
@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     borderRadius: 8,
     paddingVertical: 12,
     paddingHorizontal: 20,

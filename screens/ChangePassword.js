@@ -68,7 +68,7 @@ const ChangePassword = () => {
         style={styles.backButton}
         onPress={() => navigation.goBack()}
       >
-        <Icon name="arrow-left" size={24} color="#4a90e2" />
+        <Icon name="arrow-left" size={24} color="#bd84f6" />
       </TouchableOpacity>
 
       <Text style={styles.header}>Change Your Password</Text>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   modalButton: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     padding: 10,
     borderRadius: 5,
     width: '100%',

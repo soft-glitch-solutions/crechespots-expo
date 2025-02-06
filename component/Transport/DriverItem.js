@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   button: {
-    backgroundColor: '#4a90e2',
+    backgroundColor: '#bd84f6',
     borderRadius: 5,
     paddingVertical: 8,
     paddingHorizontal: 16,
