@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
 
@@ -10,9 +10,9 @@ const SearchInput = ({ searchQuery, onSearchQueryChange }) => {
   const [ageGroup, setAgeGroup] = useState('');
   const [facilities, setFacilities] = useState([]);
   const [distance, setDistance] = useState('');
+  const [currentLocation, setCurrentLocation] = useState(''); // Allow user to set location
 
   const handleSearch = () => {
-    // Perform search with filters
     console.log('Searching with filters:', {
       searchQuery,
       weeklyPrice,
@@ -20,8 +20,9 @@ const SearchInput = ({ searchQuery, onSearchQueryChange }) => {
       ageGroup,
       facilities,
       distance,
+      currentLocation,  // Added location to search filters
     });
-    setIsModalVisible(false); // Close the modal after search
+    setIsModalVisible(false); 
   };
 
   const handleClearFilters = () => {
@@ -30,6 +31,7 @@ const SearchInput = ({ searchQuery, onSearchQueryChange }) => {
     setAgeGroup('');
     setFacilities([]);
     setDistance('');
+    setCurrentLocation(''); // Clear location
   };
 
   return (
@@ -52,6 +54,16 @@ const SearchInput = ({ searchQuery, onSearchQueryChange }) => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+
+          <View style={styles.filterSection}>
+                <Text style={styles.filterLabel}>Adjust Your Location</Text>
+                <TextInput
+                  style={styles.priceInput}
+                  placeholder="Enter your location"
+                  value={currentLocation}
+                  onChangeText={setCurrentLocation}
+                />
+              </View>
             {/* Search Bar */}
             <View style={styles.modalSearchContainer}>
               <Icon name="search" size={20} color="#888" style={styles.icon} />
@@ -132,17 +144,9 @@ const SearchInput = ({ searchQuery, onSearchQueryChange }) => {
                 </View>
               </View>
 
-              {/* Distance */}
-              <View style={styles.filterSection}>
-                <Text style={styles.filterLabel}>Distance (km)</Text>
-                <TextInput
-                  style={styles.priceInput}
-                  placeholder="Enter max distance"
-                  value={distance}
-                  onChangeText={setDistance}
-                  keyboardType="numeric"
-                />
-              </View>
+
+              {/* Location */}
+
             </ScrollView>
 
             {/* Buttons */}
@@ -175,8 +179,8 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -232,7 +236,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    padding: 8,
+    padding: 12,
     fontSize: 16,
   },
   picker: {

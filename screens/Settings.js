@@ -8,7 +8,12 @@ const Settings = () => {
 
   const handleLogout = () => {
     console.log("Logout pressed");
-    // Add your logout logic here
+
+    // Clear any authentication tokens or session data here
+    // Example: AsyncStorage.removeItem('userToken');
+
+    // Navigate to the login screen
+    navigation.navigate('Login'); // Assuming 'Login' is the name of your login screen
   };
 
   return (
