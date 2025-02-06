@@ -9,6 +9,7 @@ const MyCentreDetails = ({ route, navigation }) => {
   const { studentId } = route.params;
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedTab, setSelectedTab] = useState('details'); // Default selected tab
 
   useEffect(() => {
     fetchStudentDetails();
@@ -76,6 +77,69 @@ const MyCentreDetails = ({ route, navigation }) => {
     );
   }
 
+  const renderDetailsTab = () => (
+    <View style={styles.card}>
+      <View style={styles.detailContainer}>
+        <Icon name="user" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>Name: {student.name}</Text>
+      </View>
+      <View style={styles.detailContainer}>
+        <Icon name="calendar" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>Age: {student.age}</Text>
+      </View>
+      <View style={styles.detailContainer}>
+        <Icon name="birthday-cake" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>DOB: {student.dob}</Text>
+      </View>
+      <View style={styles.detailContainer}>
+        <Icon name="book" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>Class: {student.class}</Text>
+      </View>
+      <View style={styles.detailContainer}>
+        <Icon name="home" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>Address: {student.address}</Text>
+      </View>
+      <View style={styles.detailContainer}>
+        <Icon name="stethoscope" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>Disabilities/Allergies: {student.disabilities_allergies}</Text>
+      </View>
+      <View style={styles.detailContainer}>
+        <Icon name="dollar" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>Fees Owed: {student.fees_owed}</Text>
+      </View>
+      <View style={styles.detailContainer}>
+        <Icon name="dollar" size={20} color="#4a90e2" />
+        <Text style={styles.detail}>Fees Paid: {student.fees_paid}</Text>
+      </View>
+    </View>
+  );
+
+  const renderButtons = () => (
+    <View style={styles.buttonGrid}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handlePayFees}
+      >
+        <Icon name="credit-card" size={20} color="#ffffff" style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Pay Fees</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLessonPlan}
+      >
+        <Icon name="book" size={20} color="#ffffff" style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Lesson Plan</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleDropOff}
+      >
+        <Icon name="check-circle" size={20} color="#ffffff" style={styles.buttonIcon} />
+        <Text style={styles.buttonText}>Dropped Off</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -84,65 +148,29 @@ const MyCentreDetails = ({ route, navigation }) => {
       >
         <Icon name="arrow-left" size={20} color="#4a90e2" />
       </TouchableOpacity>
+
+      <Text style={styles.title}>Student Details</Text>
+
+      {/* Tabs for navigation */}
+      <View style={styles.tabs}>
+        <TouchableOpacity
+          onPress={() => setSelectedTab('details')}
+          style={[styles.tab, selectedTab === 'details' && styles.activeTab]}
+        >
+          <Text style={[styles.tabText, selectedTab === 'details' && styles.activeTabText]}>Details</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setSelectedTab('actions')}
+          style={[styles.tab, selectedTab === 'actions' && styles.activeTab]}
+        >
+          <Text style={[styles.tabText, selectedTab === 'actions' && styles.activeTabText]}>Actions</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Render selected tab content */}
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.title}>Student Details</Text>
-        <View style={styles.card}>
-          <View style={styles.detailContainer}>
-            <Icon name="user" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>Name: {student.name}</Text>
-          </View>
-          <View style={styles.detailContainer}>
-            <Icon name="calendar" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>Age: {student.age}</Text>
-          </View>
-          <View style={styles.detailContainer}>
-            <Icon name="birthday-cake" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>DOB: {student.dob}</Text>
-          </View>
-          <View style={styles.detailContainer}>
-            <Icon name="book" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>Class: {student.class}</Text>
-          </View>
-          <View style={styles.detailContainer}>
-            <Icon name="home" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>Address: {student.address}</Text>
-          </View>
-          <View style={styles.detailContainer}>
-            <Icon name="stethoscope" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>Disabilities/Allergies: {student.disabilities_allergies}</Text>
-          </View>
-          <View style={styles.detailContainer}>
-            <Icon name="dollar" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>Fees Owed: {student.fees_owed}</Text>
-          </View>
-          <View style={styles.detailContainer}>
-            <Icon name="dollar" size={20} color="#4a90e2" />
-            <Text style={styles.detail}>Fees Paid: {student.fees_paid}</Text>
-          </View>
-        </View>
-        <View style={styles.buttonGrid}>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handlePayFees}
-          >
-            <Icon name="credit-card" size={20} color="#ffffff" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Pay Fees</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleLessonPlan}
-          >
-            <Icon name="book" size={20} color="#ffffff" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Lesson Plan</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={handleDropOff}
-          >
-            <Icon name="check-circle" size={20} color="#ffffff" style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Dropped Off</Text>
-          </TouchableOpacity>
-        </View>
+        {selectedTab === 'details' && renderDetailsTab()}
+        {selectedTab === 'actions' && renderButtons()}
       </ScrollView>
     </View>
   );
@@ -164,15 +192,45 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
-    paddingTop: 20, // Ensure the title is not hidden
+    paddingTop: 20,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 1,
+  },
+  tabs: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: '#ddd',
+  },
+  tab: {
+    paddingVertical: 10,
+    flex: 1,
+    alignItems: 'center',
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: '#4a90e2',
+  },
+  tabText: {
+    fontSize: 18,
+    color: '#555',
+  },
+  activeTabText: {
+    color: '#4a90e2',
+    fontWeight: 'bold',
   },
   card: {
     backgroundColor: '#f9f9f9',
     borderRadius: 8,
     padding: 16,
     marginBottom: 20,
-    elevation: 3, // Shadow effect for Android
-    shadowColor: '#000', // Shadow effect for iOS
+    elevation: 3,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -202,7 +260,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
-    width: '48%', // Ensures buttons are side-by-side
+    width: '48%',
     justifyContent: 'center',
   },
   buttonText: {

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Alert, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import supabase from '../supabaseClient';
+import { Ionicons } from '@expo/vector-icons'; // For the plus icon
+import AddChildModal from './AddChildModal'; // A new modal to add child profile
 
 const MyChild = ({ navigation }) => {
   const [students, setStudents] = useState([]);
   const [creches, setCreches] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     fetchStudentsAndCreches();
@@ -46,6 +49,11 @@ const MyChild = ({ navigation }) => {
     }
   };
 
+  const addNewStudent = (newStudent) => {
+    setStudents((prevStudents) => [...prevStudents, newStudent]);
+    setShowModal(false);
+  };
+
   if (loading) {
     return <ActivityIndicator size="large" color="#4a90e2" style={styles.loadingIndicator} />;
   }
@@ -75,6 +83,7 @@ const MyChild = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Children</Text>
+
       <FlatList
         data={students}
         keyExtractor={(item) => item.id.toString()}
@@ -99,6 +108,14 @@ const MyChild = ({ navigation }) => {
           </View>
         )}
       />
+
+      {/* Add child button */}
+      <TouchableOpacity style={styles.addButton} onPress={() => setShowModal(true)}>
+        <Ionicons name="add-circle" size={60} color="#4a90e2" />
+      </TouchableOpacity>
+
+      {/* Modal to add new child */}
+      {showModal && <AddChildModal addNewStudent={addNewStudent} />}
     </View>
   );
 };
@@ -191,5 +208,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 20,
+    right: 20,
+    zIndex: 10,
   },
 });

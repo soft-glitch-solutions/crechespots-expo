@@ -17,6 +17,7 @@ const FeedDetails = ({ route, navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
+      {/* Header Section */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Icon name="arrow-left" size={24} color="#007bff" />
@@ -26,7 +27,11 @@ const FeedDetails = ({ route, navigation }) => {
           <Text style={styles.date}>{new Date(article.created_at).toLocaleDateString()}</Text>
         </View>
       </View>
+
+      {/* Article Content */}
       <Text style={styles.content}>{article.content}</Text>
+
+      {/* Action Buttons */}
       <View style={styles.actionsContainer}>
         {article.type === 'Donation' && (
           <TouchableOpacity style={styles.actionButton} onPress={handleDonate}>
@@ -48,17 +53,16 @@ const FeedDetails = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20, // Adjusted padding
-    paddingTop: 100,
     backgroundColor: '#f9f9f9',
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20, // Increased margin
+    marginBottom: 24,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    paddingBottom: 12, // Increased padding
+    paddingBottom: 16,
   },
   backButton: {
     marginRight: 16,
@@ -67,38 +71,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontWeight: '600',
     color: '#333',
-    marginBottom: 4, // Added margin bottom
+    marginBottom: 6,
   },
   date: {
     fontSize: 14,
     color: '#888',
-    marginTop: 4,
   },
   content: {
     fontSize: 16,
     color: '#444',
-    marginBottom: 24, // Increased margin bottom
+    lineHeight: 24,
+    marginBottom: 28,
   },
   actionsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 20,
+    marginTop: 30,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#007bff',
-    paddingVertical: 12, // Increased padding vertical
-    paddingHorizontal: 24, // Increased padding horizontal
-    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    elevation: 4, // Shadow effect for modern look
   },
   actionText: {
     color: '#fff',
     fontSize: 16,
-    marginLeft: 8,
+    marginLeft: 10,
+    fontWeight: '500',
   },
 });
 

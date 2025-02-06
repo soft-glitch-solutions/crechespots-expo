@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Swiper from 'react-native-swiper';
 
 const placeholderImage = 'https://crechespots.org.za/wp-content/uploads/2024/08/recheSpot-1.gif';
 const registeredIcon = require('../../assets/images/Registered.png');
@@ -13,12 +14,16 @@ const CrecheItem = ({ creche, onSelectCreche }) => {
       style={styles.crecheItem}
       onPress={() => onSelectCreche(creche.id)}
     >
-      {/* Main Image */}
-      <Image
-        source={{ uri: logoUri }}
-        style={styles.mainImage}
-        onError={(e) => console.log('Image loading error:', e.nativeEvent.error)}
-      />
+      {/* Gallery */}
+      {creche.gallery && creche.gallery.length > 0 ? (
+        <Swiper style={styles.carousel} showsPagination loop>
+          {creche.gallery.map((image, index) => (
+            <Image key={index} source={{ uri: image }} style={styles.carouselImage} />
+          ))}
+        </Swiper>
+      ) : (
+        <Image source={{ uri: logoUri }} style={styles.mainImage} />
+      )}
 
       {/* Price and Availability */}
       <View style={styles.priceContainer}>
@@ -42,12 +47,18 @@ const CrecheItem = ({ creche, onSelectCreche }) => {
       </View>
 
       {/* Registered Icon */}
-      {creche.registered && (
+      <View style={styles.registeredContainer}>
+        {creche.registered && (
+          <Image
+            source={registeredIcon}
+            style={styles.registeredIcon}
+          />
+        )}
         <Image
-          source={registeredIcon}
-          style={styles.registeredIcon}
+          source={{ uri: logoUri }}
+          style={styles.logo}
         />
-      )}
+      </View>
 
       {/* View Details Button */}
       <TouchableOpacity style={styles.detailsButton} onPress={() => onSelectCreche(creche.id)}>
@@ -70,6 +81,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   mainImage: {
+    width: '100%',
+    height: 150,
+    resizeMode: 'cover',
+  },
+  carousel: {
+    height: 150,
+  },
+  carouselImage: {
     width: '100%',
     height: 150,
     resizeMode: 'cover',
@@ -119,12 +138,22 @@ const styles = StyleSheet.create({
     color: '#666',
     marginLeft: 8,
   },
+  registeredContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginTop: 10,
+  },
   registeredIcon: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
     width: 50,
     height: 50,
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Make it circular
+    marginLeft: 10,
   },
   detailsButton: {
     backgroundColor: '#bd84f6',

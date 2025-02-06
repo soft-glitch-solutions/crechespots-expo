@@ -67,9 +67,6 @@ const AppNavigator = () => {
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
-        </>
-      ) : (
-        <>
           <Stack.Screen name="CrecheDetails" component={CrecheDetails} />
           <Stack.Screen name="ApplicationDetails" component={ApplicationDetails} />
           <Stack.Screen name="EditApplication" component={EditApplication} />
@@ -81,6 +78,11 @@ const AppNavigator = () => {
           <Stack.Screen name="DeveloperScreen" component={DeveloperScreen} />
           <Stack.Screen name="NewsDetails" component={NewsDetails} />
           <Stack.Screen name="ChangePassword" component={ChangePassword} />
+
+        </>
+      ) : (
+        <>
+
         </>
       )}
     </Stack.Navigator>
