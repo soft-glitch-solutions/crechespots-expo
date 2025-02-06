@@ -55,7 +55,9 @@ const DrawerNavigator = () => {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) {
-        Alert.alert('Error', 'Unable to fetch user session');
+        // Redirect to Login if user is not authenticated
+        Alert.alert('Not Signed In', 'Please log in to continue.');
+        navigation.replace('Login'); 
         return;
       }
 

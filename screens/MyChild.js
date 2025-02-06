@@ -84,6 +84,11 @@ const MyChild = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>My Children</Text>
 
+        {/* Add child button at the top right */}
+  <TouchableOpacity style={styles.addButton} onPress={() => setShowModal(true)}>
+    <Ionicons name="add-circle" size={40} color="#bd84f6" />
+  </TouchableOpacity>
+
       <FlatList
         data={students}
         keyExtractor={(item) => item.id.toString()}
@@ -108,11 +113,6 @@ const MyChild = ({ navigation }) => {
           </View>
         )}
       />
-
-      {/* Add child button */}
-      <TouchableOpacity style={styles.addButton} onPress={() => setShowModal(true)}>
-        <Ionicons name="add-circle" size={60} color="#bd84f6" />
-      </TouchableOpacity>
 
       {/* Modal to add new child */}
       {showModal && <AddChildModal addNewStudent={addNewStudent} />}
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 20,
+    top: 20, // Adjust for status bar
     right: 20,
     zIndex: 10,
   },
