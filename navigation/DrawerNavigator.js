@@ -16,8 +16,8 @@ const homeIcon = require('../assets/icons/home.png');
 const settingsIcon = require('../assets/icons/settings.png');
 const applicationsIcon = require('../assets/icons/applications.png');
 const developerIcon = require('../assets/icons/developer.png');
-const helpIcon = require('../assets/icons/help.png');
-const supportIcon = require('../assets/icons/support.png');
+const helpIcon = require('../assets/icons/support.png');
+const supportIcon = require('../assets/icons/help.png');
 
 const Drawer = createDrawerNavigator();
 
