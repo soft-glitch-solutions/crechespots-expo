@@ -31,19 +31,6 @@ const JoinScreen2 = ({ navigation }) => {
       </View>
 
       {/* Footer Navigation */}
-      <View style={styles.footer}>
-        <TouchableOpacity onPress={() => console.log('Skip')}>
-          <Text style={styles.skipText}>SKIP</Text>
-        </TouchableOpacity>
-        <View style={styles.pagination}>
-          <View style={[styles.dot, styles.activeDot]} />
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-        </View>
-        <TouchableOpacity onPress={() => console.log('Next')}>
-          <Text style={styles.nextText}>NEXT</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -52,37 +39,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'flex-start', // Ensures content starts below the background
   },
   backgroundShape: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
+    zIndex: -1, // Keeps the background behind content
   },
   content: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: '10%',
+    paddingTop: screenHeight * 0.2, // Adjust paddingTop to ensure enough space for background
   },
   mainImage: {
-    width: '100%',
-    height: '40%',
+    width: '80%', // Ensures the image is responsive and does not take up the entire screen
+    height: undefined,
+    aspectRatio: 1, // Maintains the aspect ratio of the image
     marginBottom: 20,
   },
   title: {
-    fontSize: 20,
+    fontSize: 18, // Adjusted font size for a better fit on smaller screens
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 10,
     color: '#333',
+    width: '80%', // Limits the title width to fit the screen
   },
   description: {
-    fontSize: 14,
+    fontSize: 14, // Reduced font size for better readability on mobile screens
     textAlign: 'center',
     color: '#555',
     lineHeight: 20,
+    marginHorizontal: 20, // Adds horizontal padding to prevent text from touching the edges
   },
   footer: {
     flexDirection: 'row',
@@ -90,6 +82,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingBottom: 20,
+    position: 'absolute', // Ensures the footer stays at the bottom
+    bottom: 0,
+    width: '100%',
   },
   skipText: {
     fontSize: 14,

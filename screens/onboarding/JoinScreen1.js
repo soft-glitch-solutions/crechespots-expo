@@ -37,6 +37,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    justifyContent: 'center', // Centers content vertically
+    alignItems: 'center',     // Centers content horizontally
   },
   backgroundShape: {
     position: 'absolute',
@@ -49,11 +51,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginTop: '10%',
+    marginTop: screenHeight * 0.1, // Provides space from top
   },
   mainImage: {
-    width: '100%',
-    height: '40%',
+    width: '80%',
+    height: undefined,
+    aspectRatio: 1,
     marginBottom: 20,
   },
   title: {
