@@ -105,7 +105,7 @@ const MyChild = ({ navigation }) => {
               <Text style={styles.studentDetails}>Fees Paid: ${item.fees_paid}</Text>
               <TouchableOpacity
                 style={styles.detailsButton}
-                onPress={() => navigation.navigate('MyCentreDetails', { studentId: item.id })}
+                onPress={() => navigation.navigate('MyChildDetails', { studentId: item.id })}
               >
                 <Text style={styles.detailsButtonText}>View Details</Text>
               </TouchableOpacity>

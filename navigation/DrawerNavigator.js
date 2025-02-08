@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, ActivityIndicator, Alert } from 'react-native';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer';
 import supabase from '../supabaseClient';
-
 import HomeTabs from './HomeTabs';
 import Settings from '../screens/Settings';
 import YourApplications from '../screens/YourApplications';
@@ -10,40 +9,33 @@ import Help from '../screens/Help';
 import Support from '../screens/Support';
 import Profile from '../screens/Profile';
 import DeveloperScreen from '../screens/developer/DeveloperScreen';
+import LogoutScreen from '../screens/LogoutScreen';
 
-// Import your images
+// Import images
 const homeIcon = require('../assets/icons/home.png');
 const settingsIcon = require('../assets/icons/settings.png');
 const applicationsIcon = require('../assets/icons/applications.png');
 const developerIcon = require('../assets/icons/developer.png');
-const helpIcon = require('../assets/icons/support.png');
-const supportIcon = require('../assets/icons/help.png');
+const helpIcon = require('../assets/icons/help.png');
+const supportIcon = require('../assets/icons/support.png');
+const logoutIcon = require('../assets/icons/logout.png');
 
 const Drawer = createDrawerNavigator();
 
-// Define unique background colors for each menu item's icon
+// Define background colors for icons
 const menuItemIconColors = {
-  Home: '#FFDDC1', // Light orange
-  Settings: '#C1FFD7', // Light green
-  MyApplications: '#C1D7FF', // Light blue
-  Developer: '#FFC1E3', // Light pink
-  Help: '#FFC1C1', // Light red
-  Support: '#E3C1FF', // Light purple
+  Home: '#FFDDC1',
+  Settings: '#C1FFD7',
+  MyApplications: '#C1D7FF',
+  Developer: '#FFC1E3',
+  Help: '#FFC1C1',
+  Support: '#E3C1FF',
+  Logout: '#FFB6C1',
 };
 
-const DrawerNavigator = () => {
-  const [profile, setProfile] = useState({
-    display_name: '',
-    email: '',
-    first_name: '',
-    last_name: '',
-    phone_number: '',
-    id_number: '',
-    profile_picture_url: '',
-    bio: '',
-    role: '',
-  });
-  const [loading, setLoading] = useState(false);
+const DrawerNavigator = ({ onLogout }) => {
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [isDeveloper, setIsDeveloper] = useState(false);
 
   useEffect(() => {
@@ -55,37 +47,21 @@ const DrawerNavigator = () => {
     try {
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !session) {
-        // Redirect to Login if user is not authenticated
         Alert.alert('Not Signed In', 'Please log in to continue.');
-        navigation.replace('Login'); 
         return;
       }
 
       const { data, error } = await supabase
         .from('users')
-        .select(`
-          display_name, email, first_name, last_name,
-          phone_number, id_number, profile_picture_url, bio, roles(role_name)
-        `)
+        .select(`display_name, email, profile_picture_url, roles(role_name)`)
         .eq('id', session.user.id)
         .single();
 
       if (error) {
         Alert.alert('Error', 'Error fetching profile data');
-        console.error('Profile Fetch Error:', error);
+        console.error(error);
       } else {
-        setProfile({
-          display_name: data.display_name,
-          email: data.email,
-          first_name: data.first_name,
-          last_name: data.last_name,
-          phone_number: data.phone_number,
-          id_number: data.id_number,
-          profile_picture_url: data.profile_picture_url,
-          bio: data.bio,
-          role: data.roles.role_name,
-        });
-
+        setProfile(data);
         setIsDeveloper(data.roles.role_name === 'Developer');
       }
     } catch (error) {
@@ -103,7 +79,7 @@ const DrawerNavigator = () => {
         <View style={styles.drawerItemsContainer}>
           <DrawerItem
             label="Home"
-            icon={({ color, size }) => (
+            icon={() => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Home }]}>
                 <Image source={homeIcon} style={styles.icon} />
               </View>
@@ -112,7 +88,7 @@ const DrawerNavigator = () => {
           />
           <DrawerItem
             label="Settings"
-            icon={({ color, size }) => (
+            icon={() => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Settings }]}>
                 <Image source={settingsIcon} style={styles.icon} />
               </View>
@@ -121,7 +97,7 @@ const DrawerNavigator = () => {
           />
           <DrawerItem
             label="My Applications"
-            icon={({ color, size }) => (
+            icon={() => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.MyApplications }]}>
                 <Image source={applicationsIcon} style={styles.icon} />
               </View>
@@ -131,7 +107,7 @@ const DrawerNavigator = () => {
           {isDeveloper && (
             <DrawerItem
               label="Developer"
-              icon={({ color, size }) => (
+              icon={() => (
                 <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Developer }]}>
                   <Image source={developerIcon} style={styles.icon} />
                 </View>
@@ -144,7 +120,7 @@ const DrawerNavigator = () => {
         <View style={styles.bottomDrawerSection}>
           <DrawerItem
             label="Help"
-            icon={({ color, size }) => (
+            icon={() => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Help }]}>
                 <Image source={helpIcon} style={styles.icon} />
               </View>
@@ -153,12 +129,21 @@ const DrawerNavigator = () => {
           />
           <DrawerItem
             label="Support"
-            icon={({ color, size }) => (
+            icon={() => (
               <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Support }]}>
                 <Image source={supportIcon} style={styles.icon} />
               </View>
             )}
             onPress={() => props.navigation.navigate('Support')}
+          />
+          <DrawerItem
+            label="Logout"
+            icon={() => (
+              <View style={[styles.iconContainer, { backgroundColor: menuItemIconColors.Logout }]}>
+                <Image source={logoutIcon} style={styles.icon} />
+              </View>
+            )}
+            onPress={() => props.navigation.navigate('Logout')}
           />
         </View>
       </DrawerContentScrollView>
@@ -168,9 +153,7 @@ const DrawerNavigator = () => {
   return (
     <Drawer.Navigator
       drawerContent={(props) => <CustomDrawerContent {...props} />}
-      screenOptions={{
-        headerShown: false,
-      }}
+      screenOptions={{ headerShown: false }}
     >
       <Drawer.Screen name="Home" component={HomeTabs} />
       <Drawer.Screen name="Profile" component={Profile} />
@@ -179,6 +162,9 @@ const DrawerNavigator = () => {
       <Drawer.Screen name="Help" component={Help} />
       <Drawer.Screen name="Support" component={Support} />
       {isDeveloper && <Drawer.Screen name="DeveloperScreen" component={DeveloperScreen} />}
+      <Drawer.Screen name="Logout">
+        {props => <LogoutScreen {...props} onLogout={onLogout} />}
+      </Drawer.Screen>
     </Drawer.Navigator>
   );
 };
@@ -198,14 +184,13 @@ const styles = StyleSheet.create({
     borderRadius: 40,
     marginBottom: 10,
   },
-  imagePlaceholder: {
-    backgroundColor: '#e0e0e0',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   profileName: {
     fontSize: 18,
     fontWeight: 'bold',
+  },
+  profileEmail: {
+    fontSize: 14,
+    color: 'gray',
   },
   drawerItemsContainer: {
     flex: 1,
@@ -227,9 +212,5 @@ const styles = StyleSheet.create({
   icon: {
     width: 24,
     height: 24,
-  },
-  iconPlaceholder: {
-    backgroundColor: '#e0e0e0',
-    borderRadius: 4,
   },
 });

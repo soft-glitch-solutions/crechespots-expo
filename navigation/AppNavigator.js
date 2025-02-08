@@ -1,20 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OnboardingScreen from './OnboardingNavigator';
 import Login from '../screens/Login';
 import SignUp from '../screens/Signup';
+import ForgotPassword from '../screens/ForgotPassword';
+import DrawerNavigator from './DrawerNavigator';
+
+// Your other screen imports
 import CrecheDetails from '../screens/CrecheDetails';
 import ApplicationDetails from '../screens/ApplicationDetails';
-import ForgotPassword from '../screens/ForgotPassword';
 import EditApplication from '../screens/EditApplication';
-import MyCentreDetails from '../screens/MyCentreDetails';
-import LessonsDetails from '../screens/mycreche/LessonsDetails';
+import MyChildDetails from '../screens/MyChildDetails';
 import FeedDetails from '../screens/FeedDetails';
-import UserProfileScreen from '../screens/chat/UserProfileScreen';
-import DrawerNavigator from './DrawerNavigator';
-import ChatScreen from '../screens/chat/ChatScreen';
-import DeveloperScreen from '../screens/developer/DeveloperScreen';
 import NewsDetails from '../screens/NewsDetails';
 import ChangePassword from '../screens/ChangePassword';
 
@@ -29,7 +28,7 @@ const AppNavigator = () => {
     const checkStatus = async () => {
       try {
         const onboardingStatus = await AsyncStorage.getItem('onboardingCompleted');
-        const authToken = await AsyncStorage.getItem('authToken'); // Example: Check for token
+        const authToken = await AsyncStorage.getItem('authToken');
         setIsOnboardingComplete(onboardingStatus === 'true');
         setIsAuthenticated(!!authToken);
       } catch (error) {
@@ -42,17 +41,43 @@ const AppNavigator = () => {
     checkStatus();
   }, []);
 
-  const handleOnboardingComplete = async () => {
+  const handleOnboardingComplete = useCallback(async () => {
     try {
       await AsyncStorage.setItem('onboardingCompleted', 'true');
       setIsOnboardingComplete(true);
     } catch (error) {
       console.error('Failed to set onboarding status:', error);
     }
-  };
+  }, []);
+
+  const handleLogin = useCallback(async () => {
+    try {
+      await AsyncStorage.setItem('authToken', 'dummyToken'); // Replace with actual token
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Failed to set auth token:', error);
+    }
+  }, []);
+
+  const handleLogout = useCallback(async (navigation) => {
+    try {
+      await AsyncStorage.removeItem('authToken');
+      setIsAuthenticated(false);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }], // Clears navigation history
+      });
+    } catch (error) {
+      console.error('Failed to remove auth token:', error);
+    }
+  }, []);
 
   if (isLoading) {
-    return null; // Add a loading spinner here if desired
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
   }
 
   return (
@@ -63,26 +88,26 @@ const AppNavigator = () => {
         </Stack.Screen>
       ) : !isAuthenticated ? (
         <>
-          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="Login">
+            {props => <Login {...props} onLogin={handleLogin} />}
+          </Stack.Screen>
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-          <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
-          <Stack.Screen name="CrecheDetails" component={CrecheDetails} />
-          <Stack.Screen name="ApplicationDetails" component={ApplicationDetails} />
-          <Stack.Screen name="EditApplication" component={EditApplication} />
-          <Stack.Screen name="MyCentreDetails" component={MyCentreDetails} />
-          <Stack.Screen name="LessonsDetails" component={LessonsDetails} />
-          <Stack.Screen name="FeedDetails" component={FeedDetails} />
-          <Stack.Screen name="UserProfileScreen" component={UserProfileScreen} />
-          <Stack.Screen name="ChatScreen" component={ChatScreen} />
-          <Stack.Screen name="DeveloperScreen" component={DeveloperScreen} />
-          <Stack.Screen name="NewsDetails" component={NewsDetails} />
-          <Stack.Screen name="ChangePassword" component={ChangePassword} />
-
         </>
       ) : (
         <>
+          <Stack.Screen name="DrawerNavigator">
+            {props => <DrawerNavigator {...props} onLogout={handleLogout} />}
+          </Stack.Screen>
 
+          {/* Add your additional screens here */}
+          <Stack.Screen name="CrecheDetails" component={CrecheDetails} />
+          <Stack.Screen name="ApplicationDetails" component={ApplicationDetails} />
+          <Stack.Screen name="EditApplication" component={EditApplication} />
+          <Stack.Screen name="MyChildDetails" component={MyChildDetails} />
+          <Stack.Screen name="FeedDetails" component={FeedDetails} />
+          <Stack.Screen name="NewsDetails" component={NewsDetails} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} />
         </>
       )}
     </Stack.Navigator>

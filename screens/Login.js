@@ -17,7 +17,8 @@ import * as Facebook from 'expo-auth-session/providers/facebook';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const Login = ({ navigation }) => {
+
+const Login = ({ navigation, onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,17 +34,6 @@ const Login = ({ navigation }) => {
   const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
     clientId: 'YOUR_FACEBOOK_CLIENT_ID',
   });
-
-  useEffect(() => {
-    const checkSession = async () => {
-      const session = await AsyncStorage.getItem('userSession');
-      if (session) {
-        navigation.navigate('DrawerNavigator', { screen: 'FeedsList' });
-      }
-    };
-
-    checkSession();
-  }, [navigation]);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -62,7 +52,7 @@ const Login = ({ navigation }) => {
       }
 
       await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-      navigation.navigate('DrawerNavigator');
+      onLogin(); // Call onLogin to update authentication state
     } catch (error) {
       Alert.alert('Login Error', error.message);
     } finally {
@@ -84,7 +74,7 @@ const Login = ({ navigation }) => {
           Alert.alert('Google Login Error', error.message);
         } else {
           await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-          navigation.navigate('DrawerNavigator');
+          onLogin(); // Call onLogin to update authentication state
         }
       };
 
@@ -106,7 +96,7 @@ const Login = ({ navigation }) => {
           Alert.alert('Facebook Login Error', error.message);
         } else {
           await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-          navigation.navigate('DrawerNavigator');
+          onLogin(); // Call onLogin to update authentication state
         }
       };
 
