@@ -8,7 +8,34 @@ const StudentDetailsCard = ({ student }) => (
       <Icon name="user" size={20} color="#bd84f6" />
       <Text style={styles.detail}>Name: {student.name}</Text>
     </View>
-    {/* Add other student details like age, class, etc. */}
+    <View style={styles.detailContainer}>
+      <Icon name="calendar" size={20} color="#bd84f6" />
+      <Text style={styles.detail}>Age: {student.age}</Text>
+    </View>
+    <View style={styles.detailContainer}>
+      <Icon name="graduation-cap" size={20} color="#bd84f6" />
+      <Text style={styles.detail}>Class: {student.class}</Text>
+    </View>
+    <View style={styles.detailContainer}>
+      <Icon name="address-card" size={20} color="#bd84f6" />
+      <Text style={styles.detail}>Address: {student.address}</Text>
+    </View>
+    <View style={styles.detailContainer}>
+      <Icon name="stethoscope" size={20} color="#bd84f6" />
+      <Text style={styles.detail}>Disabilities/Allergies: {student.disabilities_allergies}</Text>
+    </View>
+    <View style={styles.detailContainer}>
+      <Icon name="phone" size={20} color="#bd84f6" />
+      <Text style={styles.detail}>Parent Phone: {student.parent_phone_number}</Text>
+    </View>
+    <View style={styles.detailContainer}>
+      <Icon name="envelope" size={20} color="#bd84f6" />
+      <Text style={styles.detail}>Parent Email: {student.parent_email}</Text>
+    </View>
+    <View style={styles.detailContainer}>
+      <Icon name="whatsapp" size={20} color="#bd84f6" />
+      <Text style={styles.detail}>Parent WhatsApp: {student.parent_whatsapp}</Text>
+    </View>
   </View>
 );
 
@@ -32,6 +59,7 @@ const styles = StyleSheet.create({
   detail: {
     marginLeft: 8,
     fontSize: 16,
+    flexWrap: 'wrap',
   },
 });
 

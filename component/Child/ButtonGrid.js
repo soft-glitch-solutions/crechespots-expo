@@ -1,16 +1,31 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const ButtonGrid = ({ handlePayFees }) => (
+const ButtonGrid = ({ 
+  handleAttendanceCheck, 
+  handleSendNote, 
+  handleUpdateProfile, 
+  handleRequestMeeting, 
+  setIsModalVisible 
+}) => (
   <View style={styles.buttonGrid}>
-    <TouchableOpacity
-      style={styles.button}
-      onPress={handlePayFees}>
-      <Icon name="credit-card" size={20} color="#ffffff" style={styles.buttonIcon} />
-      <Text style={styles.buttonText}>Pay Fees</Text>
+    <TouchableOpacity style={styles.button} onPress={handleAttendanceCheck}>
+      <Icon name="check-circle" size={20} color="#ffffff" style={styles.buttonIcon} />
+      <Text style={styles.buttonText}>Check Attendance</Text>
     </TouchableOpacity>
-    {/* Add other buttons */}
+    <TouchableOpacity style={styles.button} onPress={() => setIsModalVisible(true)}>
+      <Icon name="comment" size={20} color="#ffffff" style={styles.buttonIcon} />
+      <Text style={styles.buttonText}>Send a Note</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.button} onPress={handleUpdateProfile}>
+      <Icon name="edit" size={20} color="#ffffff" style={styles.buttonIcon} />
+      <Text style={styles.buttonText}>Update Profile</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.button} onPress={handleRequestMeeting}>
+      <Icon name="calendar" size={20} color="#ffffff" style={styles.buttonIcon} />
+      <Text style={styles.buttonText}>Request a Meeting</Text>
+    </TouchableOpacity>
   </View>
 );
 

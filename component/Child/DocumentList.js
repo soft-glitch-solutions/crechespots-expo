@@ -1,25 +1,38 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
+import React from 'react';
+import { View, TouchableOpacity, Text, StyleSheet, Alert, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import * as DocumentPicker from 'react-native-document-picker'; // Use this for picking documents
+import * as DocumentPicker from 'expo-document-picker'; // Use this for picking documents
 
 const DocumentList = ({ documents, handleDocumentClick, handleDocumentUpload }) => {
-
   const handleUploadClick = async () => {
-    try {
-      // Use the Document Picker to pick a document
-      const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.allFiles], // You can filter by type (e.g., PDF, Word)
-      });
+    if (Platform.OS !== 'web') {
+      try {
+        // Use the Document Picker to pick a document
+        const res = await DocumentPicker.getDocumentAsync({
+          type: 'application/*', // You can filter by type (e.g., PDF, Word)
+        });
 
-      // Pass the document back to the parent to upload
-      handleDocumentUpload(res); // This function will handle the actual upload
-    } catch (err) {
-      if (DocumentPicker.isCancel(err)) {
-        console.log('User canceled the picker');
-      } else {
+        if (res.type === 'cancel') {
+          console.log('User canceled the picker');
+        } else {
+          // Pass the document back to the parent to upload
+          handleDocumentUpload(res); // This function will handle the actual upload
+        }
+      } catch (err) {
         Alert.alert('Error', 'Something went wrong while picking the document');
+        console.error(err);
       }
+    } else {
+      // For web, use a fallback method to allow file selection
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.onchange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+          handleDocumentUpload(file); // Send the file for upload
+        }
+      };
+      input.click();
     }
   };
 
@@ -41,7 +54,7 @@ const DocumentList = ({ documents, handleDocumentClick, handleDocumentUpload }) 
             style={styles.documentItem}
             onPress={() => handleDocumentClick(doc.url)}>
             <Icon name="file" size={20} color="#bd84f6" />
-            <Text style={styles.documentText}>{doc.document_name}</Text>
+            <Text style={styles.documentText}>{doc.file_name}</Text>
           </TouchableOpacity>
         ))
       )}
