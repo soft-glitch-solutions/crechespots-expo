@@ -101,8 +101,6 @@ const MyChild = ({ navigation }) => {
             <View style={styles.profileDetails}>
               <Text style={styles.studentName}>{item.name}</Text>
               <Text style={styles.crecheName}>{crecheMap[item.creche_id] || 'Unknown Creche'}</Text>
-              <Text style={styles.studentDetails}>Fees Owed: ${item.fees_owed}</Text>
-              <Text style={styles.studentDetails}>Fees Paid: ${item.fees_paid}</Text>
               <TouchableOpacity
                 style={styles.detailsButton}
                 onPress={() => navigation.navigate('MyChildDetails', { studentId: item.id })}
