@@ -73,15 +73,19 @@ const Profile = () => {
     <View style={styles.tabContent}>
       <View style={styles.detailSection}>
         <Text style={styles.detailLabel}>Email</Text>
-        <Text style={styles.detailValue}>{safeProfile.email || 'emily.n@hotmail.com'}</Text>
+        <Text style={styles.detailValue}>{safeProfile.email }</Text>
       </View>
       <View style={styles.detailSection}>
-        <Text style={styles.detailLabel}>Date of Birth</Text>
-        <Text style={styles.detailValue}>{safeProfile.dob || 'December 07, 2020'}</Text>
+        <Text style={styles.detailLabel}>Phone Number</Text>
+        <Text style={styles.detailValue}>{safeProfile.phone_number }</Text>
+      </View>
+      <View style={styles.detailSection}>
+        <Text style={styles.detailLabel}>ID Number</Text>
+        <Text style={styles.detailValue}>{safeProfile.id_number}</Text>
       </View>
       <View style={styles.detailSection}>
         <Text style={styles.detailLabel}>Address</Text>
-        <Text style={styles.detailValue}>{safeProfile.address || 'Pasadena, California'}</Text>
+        <Text style={styles.detailValue}>{safeProfile.suburb }</Text>
       </View>
     </View>
   );
@@ -155,7 +159,7 @@ const Profile = () => {
             style={styles.profileImage}
           />
         </View>
-        <Text style={styles.profileName}>{safeProfile.name || 'Emily Nelson'}</Text>
+        <Text style={styles.profileName}>{safeProfile.first_name} {safeProfile.last_name}</Text>
         <Text style={styles.profileRole}>{safeProfile.role || 'Software Engineer'}</Text>
       </View>
 

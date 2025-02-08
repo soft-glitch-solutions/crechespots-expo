@@ -169,17 +169,7 @@ const EditApplication = () => {
               placeholder="Parent WhatsApp"
             />
           </View>
-          <View style={styles.fieldContainer}>
-            <Icon name="people-outline" size={24} color="#333" />
-            <Text style={styles.label}>Number of Children: </Text>
-            <TextInput
-              style={styles.input}
-              value={editableFields.number_of_children}
-              onChangeText={(text) => setEditableFields({ ...editableFields, number_of_children: text })}
-              placeholder="Number of Children"
-              keyboardType="numeric"
-            />
-          </View>
+
           <View style={styles.fieldContainer}>
             <Icon name="home-outline" size={24} color="#333" />
             <Text style={styles.label}>Parent Address</Text>

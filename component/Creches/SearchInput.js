@@ -34,16 +34,26 @@ const SearchInput = ({ searchQuery, onSearchQueryChange }) => {
     setCurrentLocation(''); // Clear location
   };
 
+  const handleSaveSearch = () => {
+    console.log('Saving search:', searchQuery);
+    // Add logic to save the search query or filters
+  };
+
   return (
     <>
       {/* Search Input */}
-      <TouchableOpacity
-        style={styles.searchContainer}
-        onPress={() => setIsModalVisible(true)}
-      >
-        <Icon name="search" size={20} color="#888" style={styles.icon} />
-        <Text style={styles.searchPlaceholder}>Search creches by name, location, or keyword...</Text>
-      </TouchableOpacity>
+      <View style={styles.searchContainer}>
+        <TouchableOpacity
+          style={styles.searchTouchable}
+          onPress={() => setIsModalVisible(true)}
+        >
+          <Icon name="search" size={20} color="#888" style={styles.icon} />
+          <Text style={styles.searchPlaceholder}>Search creches</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSaveSearch}>
+          <Icon name="save" size={20} color="#888" style={styles.saveIcon} />
+        </TouchableOpacity>
+      </View>
 
       {/* Overlay Modal */}
       <Modal
@@ -188,8 +198,16 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  searchTouchable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
   icon: {
     marginRight: 8,
+  },
+  saveIcon: {
+    marginLeft: 8,
   },
   searchPlaceholder: {
     flex: 1,

@@ -6,11 +6,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
 import Swiper from 'react-native-swiper';
 import supabase from '../supabaseClient';
-import Loading from '../component/loadingComponent/loading';
 
 const CrecheDetails = () => {
   const [creche, setCreche] = useState(null);
   const [crecheGalleryImages, setCrecheGalleryImages] = useState([]);
+  const { services, facilities } = creche || {};
   const [tabIndex, setTabIndex] = useState(0);
   const [routes] = useState([
     { key: 'info', title: 'Info', icon: 'information-circle' },
@@ -58,21 +58,63 @@ const CrecheDetails = () => {
   const InfoTab = () => (
     <View style={styles.tabContent}>
       <Text style={styles.sectionTitle}>Information</Text>
-      {renderInfoRow('location-outline', 'Address:', creche?.address)}
-      {renderInfoRow('call-outline', 'Phone:', creche?.phone_number, makePhoneCall)}
-      {renderInfoRow('mail-outline', 'Email:', creche?.email, sendEmail)}
-      {renderInfoRow('people-outline', 'Capacity:', creche?.capacity)}
-      {renderInfoRow('calendar-outline', 'Operating Hours:', creche?.operating_hours)}
-      {renderInfoRow('globe-outline', 'Website:', creche?.website_url, openLink, true)}
-      {renderInfoRow('document-text-outline', 'Description:', creche?.description)}
-      {renderInfoRow('checkmark-circle-outline', 'Registered:', creche?.registered ? 'Yes' : 'No')}
+      {renderInfoRow('location-outline', creche?.address)}
+      {renderInfoRow('call-outline', creche?.phone_number, makePhoneCall)}
+      {renderInfoRow('mail-outline', creche?.email, sendEmail)}
+      {renderInfoRow('people-outline', creche?.capacity)}
+      {renderInfoRow('calendar-outline', creche?.operating_hours)}
+      {renderInfoRow('document-text-outline', creche?.description)}
+      {renderInfoRow('checkmark-circle-outline', creche?.registered ? 'Registered' : 'Not Registered')}
     </View>
   );
+
+  const renderServiceRow = (serviceName, isAvailable) => {
+    return (
+      isAvailable && (
+        <View style={styles.infoRow}>
+          <Icon name="checkmark-circle-outline" size={24} color="#28a745" />
+          <Text style={styles.infoValue}>{serviceName}</Text>
+        </View>
+      )
+    );
+  };
+
+  const renderFacilityRow = (facilityName, isAvailable) => {
+    return (
+      isAvailable && (
+        <View style={styles.infoRow}>
+          <Icon name="checkmark-circle-outline" size={24} color="#28a745" />
+          <Text style={styles.infoValue}>{facilityName}</Text>
+        </View>
+      )
+    );
+  };
 
   const ServicesTab = () => (
     <View style={styles.tabContent}>
       <Text style={styles.sectionTitle}>Services</Text>
-      <Text>No services listed</Text>
+      {services && (
+        <>
+          {renderServiceRow('Full-time care', services.full_time_care)}
+          {renderServiceRow('Meals provided', services.meals_provided)}
+          {renderServiceRow('Part-time care', services.part_time_care)}
+          {renderServiceRow('Transportation', services.transportation)}
+          {renderServiceRow('After-school care', services.after_school_care)}
+          {renderServiceRow('Special education', services.special_education)}
+        </>
+      )}
+
+      <Text style={styles.sectionTitle}>Facilities</Text>
+      {facilities && (
+        <>
+          {renderFacilityRow('Kitchen', facilities.kitchen)}
+          {renderFacilityRow('Parking', facilities.parking)}
+          {renderFacilityRow('Toilets', facilities.toilets)}
+          {renderFacilityRow('Teachers', facilities.teachers)}
+          {renderFacilityRow('Classrooms', facilities.classrooms)}
+          {renderFacilityRow('Playground', facilities.playground)}
+        </>
+      )}
     </View>
   );
 
@@ -90,12 +132,11 @@ const CrecheDetails = () => {
     </View>
   );
 
-  const renderInfoRow = (iconName, label, value, onPress = null, isLink = false) => {
+  const renderInfoRow = (iconName, value, onPress = null, isLink = false) => {
     if (!value) return null;
     return (
       <View style={styles.infoRow}>
         <Icon name={iconName} size={24} color="#bd84f6" />
-        <Text style={styles.infoLabel}>{label}</Text>
         {isLink ? (
           <TouchableOpacity onPress={() => onPress(value)}>
             <Text style={styles.link}>{value}</Text>
@@ -113,8 +154,6 @@ const CrecheDetails = () => {
     reviews: ReviewsTab,
     map: MapTab,
   });
-
-  if (!creche) return <Loading />;
 
   return (
     <View style={styles.container}>

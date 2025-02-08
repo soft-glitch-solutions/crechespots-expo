@@ -25,7 +25,7 @@ const ApplicationDetails = () => {
         // Fetch application details
         const { data: appData, error: appError } = await supabase
           .from('applications')
-          .select('id, creche_id, source, message, parent_name, parent_phone_number, parent_email, application_status, submitted_at, parent_whatsapp, created_at, number_of_children, parent_address')
+          .select('id, creche_id, source, message, parent_name, parent_phone_number, parent_email, lifecycle_stage, submitted_at, parent_whatsapp, created_at, number_of_children, parent_address')
           .eq('id', applicationId)
           .single();
 
@@ -73,16 +73,15 @@ const ApplicationDetails = () => {
     return <Loading />;
   }
 
-  const canEdit = application.application_status === 'New';
+  const canEdit = application.lifecycle_stage === 'New';
 
   // Array of data to be displayed in the FlatList
   const data = [
     { id: '1', label: 'Creche', value: creche.name, icon: 'school' },
     { id: '3', label: 'Phone', value: creche.phone_number, icon: 'call-outline' },
     { id: '5', label: 'Message', value: application.message, icon: 'chatbubble-outline' },
-    { id: '9', label: 'Status', value: application.application_status, icon: 'checkmark-circle-outline' },
+    { id: '9', label: 'Status', value: application.lifecycle_stage, icon: 'checkmark-circle-outline' },
     { id: '10', label: 'Submitted At', value: new Date(application.submitted_at).toLocaleDateString(), icon: 'calendar-outline' },
-    { id: '13', label: 'Number of Children', value: application.number_of_children, icon: 'people-outline' },
   ];
 
   // Render item for FlatList
