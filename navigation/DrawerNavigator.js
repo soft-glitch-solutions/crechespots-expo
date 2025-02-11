@@ -10,6 +10,7 @@ import Support from '../screens/Support';
 import Profile from '../screens/Profile';
 import DeveloperScreen from '../screens/developer/DeveloperScreen';
 import LogoutScreen from '../screens/LogoutScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import images
 const homeIcon = require('../assets/icons/home.png');
@@ -40,15 +41,39 @@ const DrawerNavigator = ({ onLogout }) => {
 
   useEffect(() => {
     fetchProfile();
+    setupSessionListener();
   }, []);
+
+  const setupSessionListener = () => {
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        // Update stored session when it changes
+        await AsyncStorage.setItem('userSession', JSON.stringify(session));
+        await AsyncStorage.setItem('userData', JSON.stringify(session.user));
+      }
+    });
+  };
 
   const fetchProfile = async () => {
     setLoading(true);
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
-        Alert.alert('Not Signed In', 'Please log in to continue.');
-        return;
+      // First try to get session from AsyncStorage
+      const storedSession = await AsyncStorage.getItem('userSession');
+      const storedUser = await AsyncStorage.getItem('userData');
+      
+      let session;
+      if (storedSession && storedUser) {
+        session = { session: JSON.parse(storedSession), user: JSON.parse(storedUser) };
+      } else {
+        // If no stored session, get from Supabase
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError || !sessionData.session) {
+          Alert.alert('Not Signed In', 'Please log in to continue.');
+          onLogout();
+          return;
+        }
+        session = sessionData;
       }
 
       const { data, error } = await supabase
@@ -58,8 +83,8 @@ const DrawerNavigator = ({ onLogout }) => {
         .single();
 
       if (error) {
-        Alert.alert('Error', 'Error fetching profile data');
         console.error(error);
+        Alert.alert('Error', 'Error fetching profile data');
       } else {
         setProfile(data);
         setIsDeveloper(data.roles.role_name === 'Developer');

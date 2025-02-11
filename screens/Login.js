@@ -51,7 +51,11 @@ const Login = ({ navigation, onLogin }) => {
         return;
       }
 
-      await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
+      // Store both session and user data
+      await AsyncStorage.multiSet([
+        ['userSession', JSON.stringify(data.session)],
+        ['userData', JSON.stringify(data.user)]
+      ]);
       onLogin(); // Call onLogin to update authentication state
     } catch (error) {
       Alert.alert('Login Error', error.message);
@@ -63,7 +67,6 @@ const Login = ({ navigation, onLogin }) => {
   useEffect(() => {
     if (response?.type === 'success') {
       const { authentication } = response;
-      // Handle Google login with Supabase
       const signInWithGoogle = async () => {
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'google',
@@ -73,8 +76,12 @@ const Login = ({ navigation, onLogin }) => {
         if (error) {
           Alert.alert('Google Login Error', error.message);
         } else {
-          await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-          onLogin(); // Call onLogin to update authentication state
+          // Store both session and user data
+          await AsyncStorage.multiSet([
+            ['userSession', JSON.stringify(data.session)],
+            ['userData', JSON.stringify(data.user)]
+          ]);
+          onLogin();
         }
       };
 
@@ -85,7 +92,6 @@ const Login = ({ navigation, onLogin }) => {
   useEffect(() => {
     if (fbResponse?.type === 'success') {
       const { authentication } = fbResponse;
-      // Handle Facebook login with Supabase
       const signInWithFacebook = async () => {
         const { data, error } = await supabase.auth.signInWithIdToken({
           provider: 'facebook',
@@ -95,8 +101,12 @@ const Login = ({ navigation, onLogin }) => {
         if (error) {
           Alert.alert('Facebook Login Error', error.message);
         } else {
-          await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-          onLogin(); // Call onLogin to update authentication state
+          // Store both session and user data
+          await AsyncStorage.multiSet([
+            ['userSession', JSON.stringify(data.session)],
+            ['userData', JSON.stringify(data.user)]
+          ]);
+          onLogin();
         }
       };
 

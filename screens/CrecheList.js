@@ -52,9 +52,19 @@ const CrecheList = () => {
 
       const url = `https://nominatim.openstreetmap.org/reverse?lat=${location.coords.latitude}&lon=${location.coords.longitude}&format=json`;
       const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch location');
+      }
+
+      const contentType = response.headers.get('Content-Type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Invalid response format');
+      }
+
       const data = await response.json();
 
-      if (data.address) {
+      if (data && data.address) {
         const address = `${data.address.road || 'Unknown Road'}, ${data.address.city || 'Unknown City'}`;
         setRoadName(address);
         saveLocation(address, location.coords);
@@ -113,6 +123,16 @@ const CrecheList = () => {
       if (!manualLocation.trim()) return;
       const url = `https://nominatim.openstreetmap.org/search?format=json&q=${manualLocation}`;
       const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch manual location');
+      }
+
+      const contentType = response.headers.get('Content-Type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Invalid response format');
+      }
+
       const data = await response.json();
 
       if (data.length > 0) {
@@ -129,7 +149,6 @@ const CrecheList = () => {
     }
   };
 
-  
   const fetchGalleryImages = async (crecheId) => {
     try {
       const { data, error } = await supabase
@@ -273,7 +292,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
-
-
 
 export default CrecheList;
