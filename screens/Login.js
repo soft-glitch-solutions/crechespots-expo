@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,52 +7,35 @@ import {
   Alert,
   StyleSheet,
   ScrollView,
+  Image,
 } from 'react-native';
-import { MaterialIcons, Entypo } from '@expo/vector-icons'; // For icons
+import { Entypo } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../supabaseClient';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
-import * as Facebook from 'expo-auth-session/providers/facebook';
-
-WebBrowser.maybeCompleteAuthSession();
-
 
 const Login = ({ navigation, onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    expoClientId: 'YOUR_GOOGLE_EXPO_CLIENT_ID',
-    iosClientId: 'YOUR_GOOGLE_IOS_CLIENT_ID',
-    androidClientId: 'YOUR_GOOGLE_ANDROID_CLIENT_ID',
-    webClientId: 'YOUR_GOOGLE_WEB_CLIENT_ID',
-  });
-
-  const [fbRequest, fbResponse, fbPromptAsync] = Facebook.useAuthRequest({
-    clientId: 'YOUR_FACEBOOK_CLIENT_ID',
-  });
-
+  // 🟢 Supabase Email/Password Login
   const handleLogin = async () => {
     setLoading(true);
     setError('');
-
     try {
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
-
       if (authError) {
         Alert.alert('Login Error', authError.message);
         setLoading(false);
         return;
       }
-
       await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-      onLogin(); // Call onLogin to update authentication state
+      onLogin();
     } catch (error) {
       Alert.alert('Login Error', error.message);
     } finally {
@@ -60,62 +43,48 @@ const Login = ({ navigation, onLogin }) => {
     }
   };
 
-  useEffect(() => {
-    if (response?.type === 'success') {
-      const { authentication } = response;
-      // Handle Google login with Supabase
-      const signInWithGoogle = async () => {
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: 'google',
-          token: authentication.accessToken,
-        });
+  // 🟢 Supabase Google OAuth Login
+  const handleGoogleLogin = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'https://your-app-url.com/auth/callback', // Change to your actual redirect URL
+      },
+    });
 
-        if (error) {
-          Alert.alert('Google Login Error', error.message);
-        } else {
-          await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-          onLogin(); // Call onLogin to update authentication state
-        }
-      };
-
-      signInWithGoogle();
+    if (error) {
+      Alert.alert('Google Login Error', error.message);
+    } else {
+      await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
+      onLogin();
     }
-  }, [response]);
+  };
 
-  useEffect(() => {
-    if (fbResponse?.type === 'success') {
-      const { authentication } = fbResponse;
-      // Handle Facebook login with Supabase
-      const signInWithFacebook = async () => {
-        const { data, error } = await supabase.auth.signInWithIdToken({
-          provider: 'facebook',
-          token: authentication.accessToken,
-        });
+  // 🟢 Supabase Facebook OAuth Login
+  const handleFacebookLogin = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'facebook',
+      options: {
+        redirectTo: 'https://your-app-url.com/auth/callback', // Change to your actual redirect URL
+      },
+    });
 
-        if (error) {
-          Alert.alert('Facebook Login Error', error.message);
-        } else {
-          await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-          onLogin(); // Call onLogin to update authentication state
-        }
-      };
-
-      signInWithFacebook();
+    if (error) {
+      Alert.alert('Facebook Login Error', error.message);
+    } else {
+      await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
+      onLogin();
     }
-  }, [fbResponse]);
+  };
 
   return (
     <View style={styles.container}>
-      {/* Background Shapes */}
-      <View style={styles.backgroundShape1} />
-      <View style={styles.backgroundShape2} />
-
       <ScrollView contentContainerStyle={styles.innerContainer}>
         <Text style={styles.title}>Welcome Back</Text>
 
-        {/* Input Fields */}
+        {/* Email Input */}
         <View style={styles.inputContainer}>
-          <MaterialIcons name="email" size={20} color="#666" style={styles.icon} />
+          <Image source={require('../assets/icons/email.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -126,40 +95,44 @@ const Login = ({ navigation, onLogin }) => {
           />
         </View>
 
+        {/* Password Input */}
         <View style={styles.inputContainer}>
-          <Entypo name="lock" size={20} color="#666" style={styles.icon} />
+          <Image source={require('../assets/icons/padlock.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
-            secureTextEntry
+            secureTextEntry={!showPassword}
           />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Image
+              source={
+                showPassword
+                  ? require('../assets/icons/eye-open.png') // Eye Open Image
+                  : require('../assets/icons/eye-closed.png') // Eye Closed Image
+              }
+              style={styles.eyeIcon}
+            />
+          </TouchableOpacity>
         </View>
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        {/* Forgot Password Link */}
+        {/* Forgot Password */}
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
         {/* Social Login Buttons */}
-        <TouchableOpacity
-          style={[styles.socialButton, styles.googleButton]}
-          onPress={() => promptAsync()}
-          disabled={!request}
-        >
-          <Text style={styles.socialButtonText}>Sign in with Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.socialButton, styles.facebookButton]}
-          onPress={() => fbPromptAsync()}
-          disabled={!fbRequest}
-        >
-          <Text style={styles.socialButtonText}>Sign in with Facebook</Text>
-        </TouchableOpacity>
+        <View style={styles.socialContainer}>
+          <TouchableOpacity onPress={handleGoogleLogin}>
+            <Image source={require('../assets/icons/google.png')} style={styles.socialIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleFacebookLogin}>
+            <Image source={require('../assets/icons/facebook.png')} style={styles.socialIcon} />
+          </TouchableOpacity>
+        </View>
 
         {/* Login Button */}
         <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
@@ -184,26 +157,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#f5f5f5',
   },
-  backgroundShape1: {
-    position: 'absolute',
-    top: -50,
-    left: -50,
-    width: 200,
-    height: 200,
-    backgroundColor: '#bd84f6',
-    borderRadius: 100,
-    opacity: 0.1,
-  },
-  backgroundShape2: {
-    position: 'absolute',
-    bottom: -50,
-    right: -50,
-    width: 200,
-    height: 200,
-    backgroundColor: '#DB4437',
-    borderRadius: 100,
-    opacity: 0.1,
-  },
   innerContainer: {
     flexGrow: 1,
     justifyContent: 'center',
@@ -216,6 +169,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
+  eyeIcon: {
+    width: 24,
+    height: 24,
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -223,13 +180,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
     elevation: 4,
   },
   icon: {
+    width: 24,
+    height: 24,
     marginRight: 10,
   },
   input: {
@@ -248,46 +203,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 10,
   },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: 10,
+  },
+  socialIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+  },
   button: {
     backgroundColor: '#bd84f6',
     borderRadius: 10,
     paddingVertical: 14,
-    paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 5,
     marginTop: 20,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  socialButton: {
-    borderRadius: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 5,
-    marginTop: 10,
-  },
-  googleButton: {
-    backgroundColor: '#DB4437',
-  },
-  facebookButton: {
-    backgroundColor: '#3b5998',
-  },
-  socialButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textAlign: 'center',
   },
   signUpText: {
     fontSize: 16,

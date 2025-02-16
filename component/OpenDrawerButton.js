@@ -1,7 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet } from 'react-native';
+import { TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Importing Ionicons
 
 const OpenDrawerButton = () => {
   const navigation = useNavigation();
@@ -12,7 +11,10 @@ const OpenDrawerButton = () => {
 
   return (
     <TouchableOpacity style={styles.container} onPress={handleOpenDrawer}>
-      <Icon name="menu" size={20} color="#333" /> {/* Hamburger Icon */}
+      <Image
+        source={require('../assets/icons/hamburger.png')} // Replace with your menu icon image
+        style={styles.icon}
+      />
     </TouchableOpacity>
   );
 };
@@ -20,6 +22,10 @@ const OpenDrawerButton = () => {
 const styles = StyleSheet.create({
   container: {
     margin: 20,
+  },
+  icon: {
+    width: 24, // Adjust size as needed
+    height: 24,
   },
 });
 

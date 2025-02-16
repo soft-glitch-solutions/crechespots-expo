@@ -1,12 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 const getTypeColor = (type) => {
   switch (type) {
     case 'Events':
-      return '#f68484';
+      return '#bd84f6';
     case 'Helpful':
-      return '#f6cc84';
+      return '#9cdbc8';
     case 'Donation':
       return '#84a7f6';
     default:
@@ -37,30 +37,38 @@ const ArticleItem = ({ article, onHeart, onSave, onReport }) => {
   };
 
   return (
-    <View style={[styles.article, { backgroundColor: typeColor }]}>      
+    <View style={[styles.article, { backgroundColor: typeColor }]}>
+      {/* Profile & Header */}
       <View style={styles.header}>
-        <Text style={styles.articleAuthor}>{article.author.display_name}</Text>
-        <Text style={styles.articleTime}>{article.time}</Text>
-        <View>
-          <TouchableOpacity onPress={() => setIsMenuVisible(!isMenuVisible)}>
-            <Text style={styles.menuDots}>⋮</Text>
-          </TouchableOpacity>
-          {isMenuVisible && (
-            <View style={styles.dropdownMenu}>
-              <TouchableOpacity style={styles.menuItem} onPress={handleSave}>
-                <Text>{isSaved ? 'Unsave Post' : 'Save Post'}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem} onPress={handleReport}>
-                <Text>Report Post</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+        <Image source={{ uri: article.author.profile_pic }} style={styles.profileImage} />
+        <View style={styles.userInfo}>
+          <Text style={styles.articleAuthor}>{article.author.display_name}</Text>
+          <Text style={styles.articleCreche}>{article.author.creche_name || 'Unknown Creche'}</Text>
+          <Text style={styles.articleTime}>{article.time}</Text>
         </View>
+
+        {/* Menu Button */}
+        <TouchableOpacity onPress={() => setIsMenuVisible(!isMenuVisible)}>
+          <Text style={styles.menuDots}>⋮</Text>
+        </TouchableOpacity>
+
+        {isMenuVisible && (
+          <View style={styles.dropdownMenu}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleSave}>
+              <Text>{isSaved ? 'Unsave Post' : 'Save Post'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={handleReport}>
+              <Text>Report Post</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
 
+      {/* Post Content */}
       <Text style={styles.articleTitle}>{article.title}</Text>
       <Text style={styles.articleContent}>{article.content}</Text>
 
+      {/* Post Stats (Like, Comment, Save) */}
       <View style={styles.statsContainer}>
         <TouchableOpacity style={styles.statItem} onPress={handleHeart}>
           <Image
@@ -71,10 +79,7 @@ const ArticleItem = ({ article, onHeart, onSave, onReport }) => {
         </TouchableOpacity>
 
         <View style={styles.statItem}>
-          <Image
-            source={require('../../assets/custom-comment.png')}
-            style={styles.icon}
-          />
+          <Image source={require('../../assets/custom-comment.png')} style={styles.icon} />
           <Text style={styles.statText}>{article.comments || 0}</Text>
         </View>
 
@@ -104,18 +109,30 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 8,
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
+  },
+  userInfo: {
+    flex: 1,
   },
   articleAuthor: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
-  articleTime: {
+  articleCreche: {
     fontSize: 14,
-    color: '#555',
+    color: '#777',
+  },
+  articleTime: {
+    fontSize: 12,
+    color: '#999',
   },
   menuDots: {
     fontSize: 24,
@@ -156,6 +173,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 12,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
   },
   statItem: {
     flexDirection: 'row',

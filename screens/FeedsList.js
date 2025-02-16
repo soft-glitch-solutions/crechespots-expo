@@ -246,7 +246,6 @@ const handleUnheartArticle = async (articleId) => {
             <ProfileButton />
           </View>
         </View>
-          <AddArticleButton />
         </View>
       )}
       data={articles}
