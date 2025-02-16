@@ -12,7 +12,7 @@ const OpenDrawerButton = () => {
   return (
     <TouchableOpacity style={styles.container} onPress={handleOpenDrawer}>
       <Image
-        source={require('../assets/icons/hamburger.png')} // Replace with your menu icon image
+        source={require('../assets/icons/main-menu.png')} // Replace with your menu icon image
         style={styles.icon}
       />
     </TouchableOpacity>
