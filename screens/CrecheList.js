@@ -35,6 +35,7 @@ const CrecheList = () => {
   const [roadName, setRoadName] = useState('');
   const [savedLocations, setSavedLocations] = useState([]);
   const [manualLocation, setManualLocation] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -129,7 +130,37 @@ const CrecheList = () => {
     }
   };
 
-  
+  const fetchSuggestions = async (query) => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${query}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      setSuggestions(data);
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    }
+  };
+
+  const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+  };
+
+  const debouncedFetchSuggestions = debounce(fetchSuggestions, 300);
+
+  const handleInputChange = (text) => {
+    setManualLocation(text);
+    debouncedFetchSuggestions(text);
+  };
+
+  const handleSelectSuggestion = (suggestion) => {
+    setManualLocation(suggestion.display_name);
+    setSuggestions([]);
+  };
+
   const fetchGalleryImages = async (crecheId) => {
     try {
       const { data, error } = await supabase
@@ -205,9 +236,19 @@ const CrecheList = () => {
         style={styles.input}
         placeholder="Enter a road name"
         value={manualLocation}
-        onChangeText={setManualLocation}
+        onChangeText={handleInputChange}
         onSubmitEditing={handleManualLocation}
       />
+
+      {suggestions.length > 0 && (
+        <View style={styles.suggestionsContainer}>
+          {suggestions.map((suggestion, index) => (
+            <TouchableOpacity key={index} onPress={() => handleSelectSuggestion(suggestion)} style={styles.suggestionItem}>
+              <Text>{suggestion.display_name}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       {savedLocations.length > 0 && (
         <View style={styles.savedLocations}>
@@ -248,6 +289,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginBottom: 16,
   },
+  suggestionsContainer: {
+    marginBottom: 16,
+  },
+  suggestionItem: {
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
   savedLocations: {
     marginBottom: 16,
   },
@@ -273,7 +322,5 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 });
-
-
 
 export default CrecheList;

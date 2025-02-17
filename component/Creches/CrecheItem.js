@@ -34,8 +34,8 @@ const CrecheItem = ({ creche, onSelectCreche }) => {
 
         {/* Pricing */}
         <View style={styles.priceContainer}>
-          {weekly_price && <Text style={styles.price}>${weekly_price}/week</Text>}
-          {monthly_price && <Text style={styles.price}>${monthly_price}/month</Text>}
+          {weekly_price && <Text style={styles.price}>R {weekly_price}/week</Text>}
+          {monthly_price && <Text style={styles.price}>R {monthly_price}/month</Text>}
         </View>
 
         {/* Facilities & Services */}
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#28a745',
+    color: '#bd84f6',
   },
   iconRow: {
     flexDirection: 'row',
