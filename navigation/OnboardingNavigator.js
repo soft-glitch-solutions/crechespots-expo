@@ -1,49 +1,60 @@
 import React, { useRef, useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Dimensions, Image } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Text,
+  TextInput,
+  Dimensions,
+  Alert,
+  Image,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../supabaseClient';
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get('window');
 
-const OnboardingScreen = ({ onComplete }) => {
+const OnboardingScreen = ({ onComplete, navigation }) => {
   const scrollViewRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
 
-  // Handle scroll to update the current index
   const handleScroll = (event) => {
     const index = Math.floor(event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width);
     setCurrentIndex(index);
   };
 
-  // Handle next button click
   const handleNext = () => {
-    if (currentIndex < 2) {
-      scrollViewRef.current.scrollTo({
-        x: (currentIndex + 1) * screenWidth,
-        animated: true,
-      });
+    if (currentIndex < 5) {
+      scrollViewRef.current.scrollTo({ x: (currentIndex + 1) * screenWidth, animated: true });
     } else {
-      handleGetStarted();
+      handleSignUp();
     }
   };
 
-  // Handle skip button click
-  const handleSkip = async () => {
-    try {
-      await AsyncStorage.setItem('onboardingCompleted', 'true');
-      onComplete();
-    } catch (error) {
-      console.error('Failed to set onboarding status:', error);
+  const handleSignUp = async () => {
+    if (!email || !firstName || !lastName || idNumber.length !== 13) {
+      Alert.alert('Error', 'Please enter valid details. ID Number must be 13 digits.');
+      return;
     }
+
+    const { data, error } = await supabase.from('users').insert([{ email, firstName, lastName, idNumber }]);
+    if (error) {
+      Alert.alert('Signup Failed', error.message);
+      return;
+    }
+
+    await AsyncStorage.setItem('onboardingCompleted', 'true');
+    await AsyncStorage.setItem('authToken', 'dummyToken');
+    onComplete();
   };
 
-  // Handle get started button click
-  const handleGetStarted = async () => {
-    try {
-      await AsyncStorage.setItem('onboardingCompleted', 'true');
-      onComplete();
-    } catch (error) {
-      console.error('Failed to set onboarding status:', error);
-    }
+  const handleSkipToLogin = () => {
+    navigation.navigate('Login');
   };
 
   return (
@@ -57,79 +68,72 @@ const OnboardingScreen = ({ onComplete }) => {
         ref={scrollViewRef}
         contentContainerStyle={styles.scrollView}
       >
-        {/* First Slide */}
+        {/* Onboarding Slide 1 */}
         <View style={styles.screen}>
-          <Image
-            source={require('../assets/images/Background Shape.png')}
-            style={[styles.backgroundShape, { height: screenHeight * 0.3 }]}
-            resizeMode="cover"
-          />
-          <View style={styles.content}>
-            <Image
-              source={require('../assets/images/teacher_trying_to_get_mikaeel_to_speak 1.png')}
-              style={styles.mainImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>Welcome to CrecheSpots</Text>
-            <Text style={styles.description}>Find a safe and trusted creche for your child</Text>
-          </View>
+          <Image source={require('../assets/images/teacher_trying_to_get_mikaeel_to_speak_1.png')} style={styles.image} />
+          <Text style={styles.title}>Welcome to Our App!</Text>
+          <Text style={styles.blurb}>We're excited to have you here. Let's get started.</Text>
         </View>
 
-        {/* Second Slide */}
+        {/* Onboarding Slide 2 */}
         <View style={styles.screen}>
-          <Image
-            source={require('../assets/images/BackgroundShapeob2.png')}
-            style={[styles.backgroundShape, { height: screenHeight * 0.3 }]}
-            resizeMode="cover"
-          />
-          <View style={styles.content}>
-            <Image
-              source={require('../assets/images/chuckie.png')}
-              style={styles.mainImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>Stay Connected</Text>
-            <Text style={styles.description}>Keep track of what your child is doing, from playtime to learning moments.</Text>
-          </View>
+          <Image source={require('../assets/images/teacher_trying_to_get_mikaeel_to_speak_1.png')} style={styles.image} />
+          <Text style={styles.title}>Learn and Grow</Text>
+          <Text style={styles.blurb}>Discover new ways to achieve your goals with our platform.</Text>
         </View>
 
-        {/* Third Slide */}
+        {/* Onboarding Slide 3 */}
         <View style={styles.screen}>
-          <Image
-            source={require('../assets/images/BackgroundShapeob3.png')}
-            style={[styles.backgroundShape, { height: screenHeight * 0.3 }]}
-            resizeMode="cover"
+          <Image source={require('../assets/images/teacher_trying_to_get_mikaeel_to_speak_1.png')} style={styles.image} />
+          <Text style={styles.title}>Get Started</Text>
+          <Text style={styles.blurb}>Let's set up your account to unlock all features.</Text>
+        </View>
+
+        {/* Signup Slide 1 - Email */}
+        <View style={styles.screen}>
+          <Text style={styles.title}>Enter your Email</Text>
+          <Text style={styles.blurb}>We'll use this to create your account.</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
           />
-          <View style={styles.content}>
-            <Image
-              source={require('../assets/images/delisha_read_to_the_ghetto.png')}
-              style={styles.mainImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>Peace of Mind</Text>
-            <Text style={styles.description}>Get daily reports and updates, so you can feel confident about your child's care.</Text>
-          </View>
+        </View>
+
+        {/* Signup Slide 2 - Name */}
+        <View style={styles.screen}>
+          <Text style={styles.title}>Your Name</Text>
+          <Text style={styles.blurb}>Tell us a little about yourself.</Text>
+          <TextInput style={styles.input} placeholder="First Name" value={firstName} onChangeText={setFirstName} />
+          <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
+        </View>
+
+        {/* Signup Slide 3 - ID Number */}
+        <View style={styles.screen}>
+          <Text style={styles.title}>Enter Your ID Number</Text>
+          <Text style={styles.blurb}>This helps us verify your identity.</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="ID Number"
+            value={idNumber}
+            onChangeText={setIdNumber}
+            keyboardType="numeric"
+            maxLength={13}
+          />
         </View>
       </ScrollView>
 
       {/* Footer Navigation */}
       <View style={styles.footer}>
-        <TouchableOpacity onPress={handleSkip}>
-          <Text style={styles.skipText}>SKIP</Text>
-        </TouchableOpacity>
-        <View style={styles.pagination}>
-          {[0, 1, 2].map((_, index) => (
-            <View
-              key={index}
-              style={[styles.dot, index === currentIndex && styles.activeDot]}
-            />
-          ))}
-        </View>
-        <TouchableOpacity
-          style={styles.nextButton}
-          onPress={handleNext}
-        >
-          <Text style={styles.nextText}>{currentIndex < 2 ? 'NEXT' : 'GET STARTED'}</Text>
+        {currentIndex < 3 && (
+          <TouchableOpacity style={styles.skipButton} onPress={handleSkipToLogin}>
+            <Text style={styles.skipText}>Skip to Login</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextText}>{currentIndex < 5 ? 'NEXT' : 'SIGN UP'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -137,92 +141,25 @@ const OnboardingScreen = ({ onComplete }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  scrollView: {
-    flexGrow: 1,
-  },
-  screen: {
-    width: screenWidth,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden', // Prevent background and other elements from overflowing
-  },
-  backgroundShape: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: -1, // Ensure background is behind content
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: screenHeight * 0.25,
-  },
-  mainImage: {
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  scrollView: { flexGrow: 1 },
+  screen: { width: screenWidth, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  image: { width: 200, height: 200, marginBottom: 20 },
+  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10, color: '#333' },
+  blurb: { fontSize: 16, color: '#888', textAlign: 'center', marginBottom: 20 },
+  input: {
     width: '80%',
-    height: undefined,
-    aspectRatio: 1,
+    borderBottomWidth: 1,
     marginBottom: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
+    padding: 8,
+    fontSize: 16,
     color: '#333',
   },
-  description: {
-    fontSize: 14,
-    textAlign: 'center',
-    color: '#555',
-    lineHeight: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: screenWidth * 0.05,
-    paddingBottom: screenHeight * 0.03,
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  skipText: {
-    fontSize: 14,
-    color: '#888',
-  },
-  pagination: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ddd',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    backgroundColor: '#6200ea',
-  },
-  nextButton: {
-    backgroundColor: '#6200ea',
-    paddingVertical: screenHeight * 0.015,
-    paddingHorizontal: screenWidth * 0.05,
-    borderRadius: 5,
-  },
-  nextText: {
-    fontSize: 14,
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  footer: { position: 'absolute', bottom: 20, left: 0, right: 0, alignItems: 'center' },
+  nextButton: { backgroundColor: '#bd84f6', padding: 15, borderRadius: 10, width: '80%', alignItems: 'center' },
+  nextText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
+  skipButton: { marginBottom: 10 },
+  skipText: { color: '#bd84f6', fontSize: 16, fontWeight: 'bold' },
 });
 
 export default OnboardingScreen;

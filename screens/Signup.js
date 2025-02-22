@@ -9,59 +9,102 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons'; // For icons
-import { supabase } from '../supabaseClient'; // Import your Supabase client
+import { supabase } from '../supabaseClient';
 
 const SignUp = ({ navigation }) => {
+  const [userId, setUserId] = useState('');
+  const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const validateId = (id) => /^[0-9]{13}$/.test(id); // Checks 13-digit numeric only
+
   const handleSignUp = async () => {
-    setLoading(true);
     setError('');
 
-    if (password !== confirmPassword) {
-      setError("Passwords don't match");
-      setLoading(false);
+    // **Validation Checks**
+    if (!userId || !displayName || !email || !phoneNumber || !password || !confirmPassword) {
+      setError('All fields are required.');
       return;
     }
 
-    try {
-      const { data, error: authError } = await supabase.auth.signUp({ email, password });
+    if (!validateId(userId)) {
+      setError('User ID must be exactly 13 digits and contain only numbers.');
+      return;
+    }
 
-      if (authError) {
-        Alert.alert('Sign Up Error', authError.message);
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      setError('Please enter a valid email.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords don't match.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // **Check if ID already exists**
+      const { data: existingUser, error: idCheckError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', userId)
+        .single();
+
+      if (existingUser) {
+        setError('This User ID is already taken.');
         setLoading(false);
         return;
       }
 
-      const userId = data.user.id;
-      const { error: dbError } = await supabase
-        .from('users') // Ensure this is your table name
-        .upsert({
-          id: userId,
+      if (idCheckError && idCheckError.code !== 'PGRST116') {
+        setError('Error checking ID availability.');
+        setLoading(false);
+        return;
+      }
+
+      // **Create user in Supabase Auth**
+      const { data, error: authError } = await supabase.auth.signUp({ email, password });
+
+      if (authError) {
+        setError(authError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        // **Store additional user details in the database**
+        const { error: dbError } = await supabase.from('users').upsert({
+          id: userId, // 13-digit User ID
+          auth_id: data.user.id, // Supabase Auth-generated ID
           display_name: displayName,
           phone_number: phoneNumber,
           email,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
         });
 
-      if (dbError) {
-        Alert.alert('Update Error', dbError.message);
-        setLoading(false);
-        return;
-      }
+        if (dbError) {
+          setError(dbError.message);
+          setLoading(false);
+          return;
+        }
 
-      Alert.alert('Sign Up Success', 'Please check your email to confirm your account.');
-      navigation.navigate('Login');
+        Alert.alert('Sign Up Successful', 'Check your email to verify your account.');
+        navigation.navigate('Login');
+      }
     } catch (error) {
-      Alert.alert('Sign Up Error', error.message);
+      setError('An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
@@ -69,19 +112,25 @@ const SignUp = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Top Image */}
-      <Image
-        source={require('../assets/images/Signup_bg1.png')}
-        style={styles.topImage}
-        resizeMode="fill"
-      />
-
       <ScrollView contentContainerStyle={styles.innerContainer}>
         <Text style={styles.title}>Create Account</Text>
 
-        {/* Input with Icons */}
+        {/* User ID Input */}
         <View style={styles.inputContainer}>
-          <FontAwesome name="user" size={20} color="#666" style={styles.icon} />
+          <Image source={require('../assets/icons/card.png')} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="13-Digit User ID"
+            value={userId}
+            onChangeText={(text) => setUserId(text.replace(/\D/g, ''))} // Remove non-numeric
+            keyboardType="numeric"
+            maxLength={13}
+          />
+        </View>
+
+        {/* Display Name Input */}
+        <View style={styles.inputContainer}>
+          <Image source={require('../assets/icons/woman.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Display Name"
@@ -90,8 +139,9 @@ const SignUp = ({ navigation }) => {
           />
         </View>
 
+        {/* Email Input */}
         <View style={styles.inputContainer}>
-          <MaterialIcons name="email" size={20} color="#666" style={styles.icon} />
+          <Image source={require('../assets/icons/email.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Email"
@@ -102,30 +152,9 @@ const SignUp = ({ navigation }) => {
           />
         </View>
 
+        {/* Phone Number Input */}
         <View style={styles.inputContainer}>
-          <Entypo name="lock" size={20} color="#666" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Entypo name="lock" size={20} color="#666" style={styles.icon} />
-          <TextInput
-            style={styles.input}
-            placeholder="Confirm Password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <FontAwesome name="phone" size={20} color="#666" style={styles.icon} />
+          <Image source={require('../assets/icons/smartphone.png')} style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Phone Number"
@@ -135,34 +164,44 @@ const SignUp = ({ navigation }) => {
           />
         </View>
 
+        {/* Password Input */}
+        <View style={styles.inputContainer}>
+          <Image source={require('../assets/icons/padlock.png')} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+        </View>
+
+        {/* Confirm Password Input */}
+        <View style={styles.inputContainer}>
+          <Image source={require('../assets/icons/padlock.png')} style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
+        </View>
+
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        {/* Social Media Links */}
-        <Text style={styles.socialText}>Or create an account using</Text>
-        <View style={styles.socialIconsContainer}>
-          <TouchableOpacity style={styles.socialIcon}>
-            <FontAwesome name="facebook" size={28} color="#3b5998" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialIcon}>
-            <FontAwesome name="google" size={28} color="#DB4437" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialIcon}>
-            <FontAwesome name="twitter" size={28} color="#1DA1F2" />
-          </TouchableOpacity>
-        </View>
+        {/* Sign Up Button */}
+        <TouchableOpacity style={[styles.button, loading && { opacity: 0.6 }]} onPress={handleSignUp} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? 'Signing Up...' : 'Create Account'}</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.signInText}>
+          Already have an account?{' '}
+          <Text style={styles.signInLink} onPress={() => navigation.navigate('Login')}>
+            Sign In
+          </Text>
+        </Text>
       </ScrollView>
-
-      {/* Bottom Image */}
-      <Image
-        source={require('../assets/images/Signup_bg2.png')}
-        style={styles.bottomImage}
-        resizeMode="fill"
-      />
-
-      {/* Sign-Up Button */}
-      <TouchableOpacity style={styles.button} onPress={handleSignUp} disabled={loading}>
-        <Text style={styles.buttonText}>{loading ? 'Signing Up...' : 'Create'}</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -171,23 +210,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#fff',
-  },
-  topImage: {
-    position: 'absolute',
-    top: 0,
-    width: '100%',
-    height: '20%',
-  },
-  bottomImage: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    height: '20%',
+    backgroundColor: '#f5f5f5',
   },
   innerContainer: {
     flexGrow: 1,
     justifyContent: 'center',
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 28,
@@ -203,13 +231,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     paddingHorizontal: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
     elevation: 4,
   },
   icon: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
     marginRight: 10,
   },
   input: {
@@ -221,38 +248,32 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 12,
     textAlign: 'center',
+    fontSize: 14,
+    backgroundColor: '#ffe6e6',
+    padding: 10,
+    borderRadius: 5,
   },
   button: {
-    position: 'absolute',
-    bottom: 30,
-    right: 20,
     backgroundColor: '#bd84f6',
-    borderRadius: 50,
+    borderRadius: 10,
     paddingVertical: 14,
-    paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 5,
+    marginTop: 20,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
-  socialText: {
+  signInText: {
     fontSize: 16,
     textAlign: 'center',
-    color: '#666',
+    color: '#888',
+    marginTop: 20,
   },
-  socialIconsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 30,
-  },
-  socialIcon: {
-    marginHorizontal: 10,
+  signInLink: {
+    color: '#bd84f6',
+    fontWeight: 'bold',
   },
 });
 
