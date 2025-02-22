@@ -328,7 +328,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   scrollView: { flexGrow: 1 },
-  screen: { width: screenWidth, justifyContent: 'center', alignItems: 'center', padding: 20, paddingTop: 200 },
+  screen: { width: screenWidth, justifyContent: 'center', alignItems: 'center', padding: 20 },
   image: { width: 200, height: 200, marginBottom: 20 },
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10, color: '#333', textAlign: 'center' },
   blurb: { fontSize: 16, color: '#888', textAlign: 'center', marginBottom: 20 },
