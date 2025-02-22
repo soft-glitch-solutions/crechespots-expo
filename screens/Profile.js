@@ -73,11 +73,11 @@ const Profile = () => {
     <View style={styles.tabContent}>
       <View style={styles.detailSection}>
         <Text style={styles.detailLabel}>Email</Text>
-        <Text style={styles.detailValue}>{safeProfile.email }</Text>
+        <Text style={styles.detailValue}>{safeProfile.email}</Text>
       </View>
       <View style={styles.detailSection}>
         <Text style={styles.detailLabel}>Phone Number</Text>
-        <Text style={styles.detailValue}>{safeProfile.phone_number }</Text>
+        <Text style={styles.detailValue}>{safeProfile.phone_number}</Text>
       </View>
       <View style={styles.detailSection}>
         <Text style={styles.detailLabel}>ID Number</Text>
@@ -85,7 +85,11 @@ const Profile = () => {
       </View>
       <View style={styles.detailSection}>
         <Text style={styles.detailLabel}>Address</Text>
-        <Text style={styles.detailValue}>{safeProfile.suburb }</Text>
+        <Text style={styles.detailValue}>{safeProfile.suburb}, {safeProfile.city}, {safeProfile.province}</Text>
+      </View>
+      <View style={styles.detailSection}>
+        <Text style={styles.detailLabel}>Location</Text>
+        <Text style={styles.detailValue}>{safeProfile.latitude}, {safeProfile.longitude}</Text>
       </View>
     </View>
   );
@@ -94,22 +98,12 @@ const Profile = () => {
     <View style={styles.tabContent}>
       <View style={styles.activityRow}>
         <View style={styles.activityItem}>
-          <Text style={styles.activityValue}>17</Text>
-          <Text style={styles.activityLabel}>Projects Done</Text>
+          <Text style={styles.activityValue}>{safeProfile.payment_score || 'N/A'}</Text>
+          <Text style={styles.activityLabel}>Payment Score</Text>
         </View>
         <View style={styles.activityItem}>
-          <Text style={styles.activityValue}>92%</Text>
-          <Text style={styles.activityLabel}>Success Rate</Text>
-        </View>
-      </View>
-      <View style={styles.activityRow}>
-        <View style={styles.activityItem}>
-          <Text style={styles.activityValue}>5</Text>
-          <Text style={styles.activityLabel}>Teams</Text>
-        </View>
-        <View style={styles.activityItem}>
-          <Text style={styles.activityValue}>243</Text>
-          <Text style={styles.activityLabel}>Client Reports</Text>
+          <Text style={styles.activityValue}>{safeProfile.price || 'N/A'}</Text>
+          <Text style={styles.activityLabel}>Price</Text>
         </View>
       </View>
     </View>
