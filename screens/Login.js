@@ -9,7 +9,6 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import { Entypo } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../supabaseClient';
 
@@ -20,7 +19,6 @@ const Login = ({ navigation, onLogin }) => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  // 🟢 Supabase Email/Password Login
   const handleLogin = async () => {
     setLoading(true);
     setError('');
@@ -30,59 +28,30 @@ const Login = ({ navigation, onLogin }) => {
         password,
       });
       if (authError) {
-        Alert.alert('Login Error', authError.message);
+        if (authError.message.includes('invalid login credentials')) {
+          setError('Incorrect password. Please try again.');
+        } else if (authError.message.includes('user not found')) {
+          setError('No account found with this email. Please sign up.');
+        } else {
+          setError(authError.message);
+        }
         setLoading(false);
         return;
       }
       await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
       onLogin();
     } catch (error) {
-      Alert.alert('Login Error', error.message);
+      setError(error.message);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // 🟢 Supabase Google OAuth Login
-  const handleGoogleLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://your-app-url.com/auth/callback', // Change to your actual redirect URL
-      },
-    });
-
-    if (error) {
-      Alert.alert('Google Login Error', error.message);
-    } else {
-      await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-      onLogin();
-    }
-  };
-
-  // 🟢 Supabase Facebook OAuth Login
-  const handleFacebookLogin = async () => {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'facebook',
-      options: {
-        redirectTo: 'https://your-app-url.com/auth/callback', // Change to your actual redirect URL
-      },
-    });
-
-    if (error) {
-      Alert.alert('Facebook Login Error', error.message);
-    } else {
-      await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-      onLogin();
     }
   };
 
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.innerContainer}>
-        <Text style={styles.title}>Welcome Back</Text>
 
-        {/* Email Input */}
+
         <View style={styles.inputContainer}>
           <Image source={require('../assets/icons/email.png')} style={styles.icon} />
           <TextInput
@@ -95,7 +64,6 @@ const Login = ({ navigation, onLogin }) => {
           />
         </View>
 
-        {/* Password Input */}
         <View style={styles.inputContainer}>
           <Image source={require('../assets/icons/padlock.png')} style={styles.icon} />
           <TextInput
@@ -109,8 +77,8 @@ const Login = ({ navigation, onLogin }) => {
             <Image
               source={
                 showPassword
-                  ? require('../assets/icons/eye-open.png') // Eye Open Image
-                  : require('../assets/icons/eye-closed.png') // Eye Closed Image
+                  ? require('../assets/icons/eye-open.png')
+                  : require('../assets/icons/eye-closed.png')
               }
               style={styles.eyeIcon}
             />
@@ -119,27 +87,23 @@ const Login = ({ navigation, onLogin }) => {
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
-        {/* Forgot Password */}
         <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
         </TouchableOpacity>
 
-        {/* Social Login Buttons */}
         <View style={styles.socialContainer}>
-          <TouchableOpacity onPress={handleGoogleLogin}>
+          <TouchableOpacity>
             <Image source={require('../assets/icons/google.png')} style={styles.socialIcon} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleFacebookLogin}>
+          <TouchableOpacity>
             <Image source={require('../assets/icons/facebook.png')} style={styles.socialIcon} />
           </TouchableOpacity>
         </View>
 
-        {/* Login Button */}
         <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
           <Text style={styles.buttonText}>{loading ? 'Logging In...' : 'Login'}</Text>
         </TouchableOpacity>
 
-        {/* Sign-Up Link */}
         <Text style={styles.signUpText}>
           Don't have an account?{' '}
           <Text style={styles.signUpLink} onPress={() => navigation.navigate('SignUp')}>
@@ -161,6 +125,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     paddingHorizontal: 20,
+  },
+  brandLogo: {
+    height: 100,
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 28,
@@ -196,6 +165,10 @@ const styles = StyleSheet.create({
     color: 'red',
     marginBottom: 12,
     textAlign: 'center',
+    fontSize: 14,
+    backgroundColor: '#ffe6e6',
+    padding: 10,
+    borderRadius: 5,
   },
   forgotPasswordText: {
     fontSize: 16,
