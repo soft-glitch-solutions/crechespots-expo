@@ -82,19 +82,28 @@ const AppNavigator = () => {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!isOnboardingComplete ? (
+      {/* Onboarding Screen */}
+      {!isOnboardingComplete && (
         <Stack.Screen name="Onboarding">
-          {props => <OnboardingScreen {...props} onComplete={handleOnboardingComplete} />}
+          {props => (
+            <OnboardingScreen
+              {...props}
+              onComplete={handleOnboardingComplete}
+              navigation={props.navigation} // Pass navigation prop
+            />
+          )}
         </Stack.Screen>
-      ) : !isAuthenticated ? (
-        <>
-          <Stack.Screen name="Login">
-            {props => <Login {...props} onLogin={handleLogin} />}
-          </Stack.Screen>
-          <Stack.Screen name="SignUp" component={SignUp} />
-          <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        </>
-      ) : (
+      )}
+
+      {/* Authentication Screens (Always part of the stack) */}
+      <Stack.Screen name="Login">
+        {props => <Login {...props} onLogin={handleLogin} />}
+      </Stack.Screen>
+      <Stack.Screen name="SignUp" component={SignUp} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+
+      {/* Authenticated Screens */}
+      {isAuthenticated && (
         <>
           <Stack.Screen name="DrawerNavigator">
             {props => <DrawerNavigator {...props} onLogout={handleLogout} />}

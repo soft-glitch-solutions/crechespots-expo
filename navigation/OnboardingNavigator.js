@@ -34,12 +34,16 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
   const scrollViewRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [idNumber, setIdNumber] = useState('');
   const [city, setCity] = useState('');
   const [province, setProvince] = useState('');
   const [profilePicture, setProfilePicture] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleScroll = (event) => {
     const index = Math.floor(event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width);
@@ -47,7 +51,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
   };
 
   const handleNext = () => {
-    if (currentIndex < 7) {
+    if (currentIndex < 8) {
       scrollViewRef.current.scrollTo({ x: (currentIndex + 1) * screenWidth, animated: true });
     } else {
       handleSignUp();
@@ -55,32 +59,63 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
   };
 
   const handleSignUp = async () => {
-    if (!email || !firstName || !lastName || idNumber.length !== 13 || !city || !province || !profilePicture) {
+    if (!email || !password || !confirmPassword || !firstName || !lastName || idNumber.length !== 13 || !city || !province || !profilePicture) {
       Alert.alert('Error', 'Please fill in all fields and upload a profile picture.');
       return;
     }
 
-    // Upload profile picture to Supabase Storage (if needed)
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('profile-pictures')
-      .upload(`public/${email}-profile.jpg`, profilePicture);
-
-    if (uploadError) {
-      Alert.alert('Upload Failed', uploadError.message);
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
 
-    const { data, error } = await supabase.from('users').insert([
-      { email, firstName, lastName, idNumber, city, province, profilePicture: uploadData?.path },
-    ]);
-    if (error) {
-      Alert.alert('Signup Failed', error.message);
-      return;
-    }
+    try {
+      // Step 1: Sign up with Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    await AsyncStorage.setItem('onboardingCompleted', 'true');
-    await AsyncStorage.setItem('authToken', 'dummyToken');
-    onComplete();
+      if (authError) {
+        Alert.alert('Signup Failed', authError.message);
+        return;
+      }
+
+      // Step 2: Upload profile picture to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('profile-pictures')
+        .upload(`public/${email}-profile.jpg`, profilePicture);
+
+      if (uploadError) {
+        Alert.alert('Upload Failed', uploadError.message);
+        return;
+      }
+
+      // Step 3: Insert user details into public.users table
+      const { error: dbError } = await supabase.from('users').insert([
+        {
+          email,
+          first_name: firstName,
+          last_name: lastName,
+          id_number: idNumber,
+          city,
+          province,
+          profile_picture_url: uploadData?.path,
+        },
+      ]);
+
+      if (dbError) {
+        Alert.alert('Database Error', dbError.message);
+        return;
+      }
+
+      // Step 4: Mark onboarding as complete and navigate
+      await AsyncStorage.setItem('onboardingCompleted', 'true');
+      await AsyncStorage.setItem('authToken', 'dummyToken');
+      onComplete();
+    } catch (error) {
+      Alert.alert('Error', 'An unexpected error occurred.');
+    }
   };
 
   const handleSkipToLogin = () => {
@@ -152,7 +187,59 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           />
         </View>
 
-        {/* Signup Slide 2 - Name */}
+        {/* Signup Slide 2 - Password */}
+        <View style={styles.screen}>
+          <Image source={require('../assets/icons/padlock.png')} style={styles.image} />
+          <Text style={styles.title}>Create a Password</Text>
+          <Text style={styles.blurb}>Choose a strong password to secure your account.</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Image
+                source={
+                  showPassword
+                    ? require('../assets/icons/eye-open.png')
+                    : require('../assets/icons/eye-closed.png')
+                }
+                style={styles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Signup Slide 3 - Confirm Password */}
+        <View style={styles.screen}>
+          <Image source={require('../assets/icons/padlock.png')} style={styles.image} />
+          <Text style={styles.title}>Confirm Password</Text>
+          <Text style={styles.blurb}>Re-enter your password to confirm.</Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+              <Image
+                source={
+                  showConfirmPassword
+                    ? require('../assets/icons/eye-open.png')
+                    : require('../assets/icons/eye-closed.png')
+                }
+                style={styles.eyeIcon}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Signup Slide 4 - Name */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/label.png')} style={styles.image} />
           <Text style={styles.title}>Your Name</Text>
@@ -161,7 +248,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
         </View>
 
-        {/* Signup Slide 3 - ID Number */}
+        {/* Signup Slide 5 - ID Number */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/card.png')} style={styles.image} />
           <Text style={styles.title}>Enter Your ID Number</Text>
@@ -176,7 +263,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           />
         </View>
 
-        {/* Signup Slide 4 - City and Province */}
+        {/* Signup Slide 6 - City and Province */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/location.png')} style={styles.image} />
           <Text style={styles.title}>Your Location</Text>
@@ -201,7 +288,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           </View>
         </View>
 
-        {/* Signup Slide 5 - Profile Picture */}
+        {/* Signup Slide 7 - Profile Picture */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/camera.png')} style={styles.image} />
           <Text style={styles.title}>Let Us See What You Look Like</Text>
@@ -217,13 +304,13 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
 
       {/* Footer Navigation */}
       <View style={styles.footer}>
-        {currentIndex >= 3 && currentIndex < 7 && (
+        {currentIndex >= 3 && currentIndex < 8 && (
           <TouchableOpacity style={styles.skipButton} onPress={handleSkipToLogin}>
             <Text style={styles.skipText}>Skip to Login</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextText}>{currentIndex < 7 ? 'NEXT' : 'SIGN UP'}</Text>
+          <Text style={styles.nextText}>{currentIndex < 8 ? 'NEXT' : 'SIGN UP'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -233,17 +320,29 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   scrollView: { flexGrow: 1 },
-  screen: { width: screenWidth, justifyContent: 'center', alignItems: 'center', padding: 20 ,  paddingTop: 200 },
+  screen: { width: screenWidth, justifyContent: 'center', alignItems: 'center', padding: 20, paddingTop: 200 },
   image: { width: 200, height: 200, marginBottom: 20 },
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10, color: '#333', textAlign: 'center' },
   blurb: { fontSize: 16, color: '#888', textAlign: 'center', marginBottom: 20 },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    marginBottom: 15,
+    paddingHorizontal: 10,
+    elevation: 4,
+  },
   input: {
-    width: '80%',
-    borderBottomWidth: 1,
-    marginBottom: 20,
-    padding: 8,
+    flex: 1,
+    height: 50,
     fontSize: 16,
     color: '#333',
+  },
+  eyeIcon: {
+    width: 24,
+    height: 24,
+    marginLeft: 10,
   },
   pickerContainer: {
     width: '80%',
