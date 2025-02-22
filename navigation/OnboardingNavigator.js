@@ -51,7 +51,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
   };
 
   const handleNext = () => {
-    if (currentIndex < 8) {
+    if (currentIndex < 7) {
       scrollViewRef.current.scrollTo({ x: (currentIndex + 1) * screenWidth, animated: true });
     } else {
       handleSignUp();
@@ -178,20 +178,24 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           <Image source={require('../assets/icons/email.png')} style={styles.image} />
           <Text style={styles.title}>Enter your Email</Text>
           <Text style={styles.blurb}>We'll use this to create your account.</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+          </View>
         </View>
 
-        {/* Signup Slide 2 - Password */}
+        {/* Signup Slide 2 - Password and Confirm Password */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/padlock.png')} style={styles.image} />
           <Text style={styles.title}>Create a Password</Text>
           <Text style={styles.blurb}>Choose a strong password to secure your account.</Text>
+
+          {/* Password Field */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
@@ -211,13 +215,8 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
               />
             </TouchableOpacity>
           </View>
-        </View>
 
-        {/* Signup Slide 3 - Confirm Password */}
-        <View style={styles.screen}>
-          <Image source={require('../assets/icons/padlock.png')} style={styles.image} />
-          <Text style={styles.title}>Confirm Password</Text>
-          <Text style={styles.blurb}>Re-enter your password to confirm.</Text>
+          {/* Confirm Password Field */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
@@ -239,42 +238,50 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           </View>
         </View>
 
-        {/* Signup Slide 4 - Name */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/label.png')} style={styles.image} />
           <Text style={styles.title}>Your Name</Text>
           <Text style={styles.blurb}>Tell us a little about yourself.</Text>
-          <TextInput style={styles.input} placeholder="First Name" value={firstName} onChangeText={setFirstName} />
-          <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
+          <View style={styles.inputContainer}>
+            <TextInput style={styles.input} placeholder="First Name" value={firstName} onChangeText={setFirstName} />
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
+          </View>
         </View>
 
-        {/* Signup Slide 5 - ID Number */}
+
+        {/* Signup Slide 4 - ID Number */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/card.png')} style={styles.image} />
           <Text style={styles.title}>Enter Your ID Number</Text>
           <Text style={styles.blurb}>This helps us verify your identity.</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="ID Number"
-            value={idNumber}
-            onChangeText={setIdNumber}
-            keyboardType="numeric"
-            maxLength={13}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="ID Number"
+              value={idNumber}
+              onChangeText={setIdNumber}
+              keyboardType="numeric"
+              maxLength={13}
+            />
+          </View>
         </View>
 
-        {/* Signup Slide 6 - City and Province */}
+        {/* Signup Slide 5 - City and Province */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/location.png')} style={styles.image} />
           <Text style={styles.title}>Your Location</Text>
           <Text style={styles.blurb}>Let us know where you're from.</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="City"
-            value={city}
-            onChangeText={setCity}
-          />
-          <View style={styles.pickerContainer}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="City"
+              value={city}
+              onChangeText={setCity}
+            />
+          </View>
+          <View style={styles.inputContainer}>
             <Picker
               selectedValue={province}
               onValueChange={(itemValue) => setProvince(itemValue)}
@@ -288,7 +295,8 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           </View>
         </View>
 
-        {/* Signup Slide 7 - Profile Picture */}
+
+        {/* Signup Slide 6 - Profile Picture */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/camera.png')} style={styles.image} />
           <Text style={styles.title}>Let Us See What You Look Like</Text>
@@ -304,13 +312,13 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
 
       {/* Footer Navigation */}
       <View style={styles.footer}>
-        {currentIndex >= 3 && currentIndex < 8 && (
+        {currentIndex >= 3 && currentIndex < 7 && (
           <TouchableOpacity style={styles.skipButton} onPress={handleSkipToLogin}>
             <Text style={styles.skipText}>Skip to Login</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextText}>{currentIndex < 8 ? 'NEXT' : 'SIGN UP'}</Text>
+          <Text style={styles.nextText}>{currentIndex < 7 ? 'NEXT' : 'SIGN UP'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -351,6 +359,11 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: '100%',
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
   },
   uploadButton: {
     backgroundColor: '#bd84f6',
