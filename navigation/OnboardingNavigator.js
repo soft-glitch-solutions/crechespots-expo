@@ -273,14 +273,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           <Image source={require('../assets/icons/location.png')} style={styles.image} />
           <Text style={styles.title}>Your Location</Text>
           <Text style={styles.blurb}>Let us know where you're from.</Text>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="City"
-              value={city}
-              onChangeText={setCity}
-            />
-          </View>
+
           <View style={styles.inputContainer}>
             <Picker
               selectedValue={province}
@@ -292,6 +285,14 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
                 <Picker.Item key={index} label={province} value={province} />
               ))}
             </Picker>
+          </View>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="City"
+              value={city}
+              onChangeText={setCity}
+            />
           </View>
         </View>
 
@@ -318,7 +319,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           </TouchableOpacity>
         )}
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextText}>{currentIndex < 7 ? 'NEXT' : 'SIGN UP'}</Text>
+          <Text style={styles.nextText}>{currentIndex < 8 ? 'NEXT' : 'SIGN UP'}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -361,6 +362,11 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   input: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+  },
+  picker: {
     flex: 1,
     height: 50,
     fontSize: 16,

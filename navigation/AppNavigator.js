@@ -8,7 +8,6 @@ import SignUp from '../screens/Signup';
 import ForgotPassword from '../screens/ForgotPassword';
 import DrawerNavigator from './DrawerNavigator';
 
-// Your other screen imports
 import CrecheDetails from '../screens/CrecheDetails';
 import ApplicationDetails from '../screens/ApplicationDetails';
 import EditApplication from '../screens/EditApplication';
