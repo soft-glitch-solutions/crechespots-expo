@@ -50,10 +50,11 @@ const AppNavigator = () => {
     }
   }, []);
 
-  const handleLogin = useCallback(async () => {
+  const handleLogin = useCallback(async (navigation) => {
     try {
       await AsyncStorage.setItem('authToken', 'dummyToken'); // Replace with actual token
       setIsAuthenticated(true);
+      navigation.replace('DrawerNavigator'); // Navigate to DrawerNavigator
     } catch (error) {
       console.error('Failed to set auth token:', error);
     }
@@ -97,7 +98,7 @@ const AppNavigator = () => {
 
       {/* Authentication Screens (Always part of the stack) */}
       <Stack.Screen name="Login">
-        {props => <Login {...props} onLogin={handleLogin} />}
+        {props => <Login {...props} onLogin={() => handleLogin(props.navigation)} />}
       </Stack.Screen>
       <Stack.Screen name="SignUp" component={SignUp} />
       <Stack.Screen name="ForgotPassword" component={ForgotPassword} />

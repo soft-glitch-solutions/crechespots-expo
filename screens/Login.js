@@ -39,7 +39,7 @@ const Login = ({ navigation, onLogin }) => {
         return;
       }
       await AsyncStorage.setItem('userSession', JSON.stringify(data.session));
-      onLogin();
+      onLogin(navigation); // Pass navigation prop to onLogin
     } catch (error) {
       setError(error.message);
     } finally {
@@ -50,11 +50,7 @@ const Login = ({ navigation, onLogin }) => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.innerContainer}>
-        {/* Add Logo Above Email Field */}
-        <Image
-          source={require('../assets/images/logo.png')} // Replace with your logo path
-          style={styles.brandLogo}
-        />
+
 
         <View style={styles.inputContainer}>
           <Image source={require('../assets/icons/email.png')} style={styles.icon} />
@@ -110,10 +106,7 @@ const Login = ({ navigation, onLogin }) => {
 
         <Text style={styles.signUpText}>
           Don't have an account?{' '}
-          <Text
-            style={styles.signUpLink}
-            onPress={() => navigation.navigate('SignUp', { onSignUpComplete: () => navigation.navigate('Onboarding') })}
-          >
+          <Text style={styles.signUpLink} onPress={() => navigation.navigate('SignUp')}>
             Sign Up
           </Text>
         </Text>
@@ -135,10 +128,8 @@ const styles = StyleSheet.create({
   },
   brandLogo: {
     height: 100,
-    width: 100,
     alignSelf: 'center',
     marginBottom: 20,
-    resizeMode: 'contain',
   },
   title: {
     fontSize: 28,
