@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, StyleSheet, Modal, Animated, TouchableOp
 import { Picker } from '@react-native-picker/picker'; // Updated import
 import supabase from '../supabaseClient'; // Adjust the path if necessary
 import { fetchProfile } from '../component/UserOperations/fetchProfile';
+import BackButton from '../component/BackButton';
 
 const Support = () => {
   const [title, setTitle] = useState('');
@@ -69,6 +70,7 @@ const Support = () => {
 
   return (
     <View style={styles.container}>
+            <BackButton />
       <Text style={styles.header}>Do you have a problem? Let us help!</Text>
 
       <TextInput

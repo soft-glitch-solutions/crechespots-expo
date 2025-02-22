@@ -7,6 +7,7 @@ const ButtonGrid = ({
   handleSendNote, 
   handleUpdateProfile, 
   handleRequestMeeting, 
+  handleViewInvoices, // New handler for invoices
   setIsModalVisible 
 }) => (
   <View style={styles.buttonGrid}>
@@ -25,6 +26,10 @@ const ButtonGrid = ({
     <TouchableOpacity style={styles.button} onPress={handleRequestMeeting}>
       <Icon name="calendar" size={20} color="#ffffff" style={styles.buttonIcon} />
       <Text style={styles.buttonText}>Request a Meeting</Text>
+    </TouchableOpacity>
+    <TouchableOpacity style={styles.button} onPress={handleViewInvoices}>
+      <Icon name="file-text" size={20} color="#ffffff" style={styles.buttonIcon} />
+      <Text style={styles.buttonText}>View Invoices</Text>
     </TouchableOpacity>
   </View>
 );

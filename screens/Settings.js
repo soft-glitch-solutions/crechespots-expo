@@ -1,42 +1,34 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import BackButton from '../component/BackButton';
 
 const Settings = () => {
   const navigation = useNavigation();
 
   const handleLogout = () => {
     console.log("Logout pressed");
-
-    // Clear any authentication tokens or session data here
-    // Example: AsyncStorage.removeItem('userToken');
-
-    // Navigate to the login screen
     navigation.navigate('Login'); // Assuming 'Login' is the name of your login screen
   };
 
   return (
     <View style={styles.container}>
-      {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-left" size={24} color="#000" />
-      </TouchableOpacity>
-
+      {/* Back Button with Image */}
+      <BackButton />
       <Text style={styles.title}>Settings</Text>
       
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Profile')}>
-          <Icon name="user" size={20} color="#bd84f6" />
+          <Image source={require('../assets/icons/woman.png')} style={styles.optionIcon} />
           <Text style={styles.optionText}>Edit Profile</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('ChangePassword')}>
-          <Icon name="lock" size={20} color="#bd84f6" />
+          <Image source={require('../assets/icons/padlock.png')} style={styles.optionIcon} />
           <Text style={styles.optionText}>Change Password</Text>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Logout Button at Bottom */}
+      {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.logoutButtonText}>Logout</Text>
       </TouchableOpacity>
@@ -59,6 +51,11 @@ const styles = StyleSheet.create({
     left: 16,
     zIndex: 10,
   },
+  backIcon: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -72,6 +69,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomColor: '#ddd',
     borderBottomWidth: 1,
+  },
+  optionIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
   },
   optionText: {
     fontSize: 16,

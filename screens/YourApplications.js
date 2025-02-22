@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl, Ale
 import { useNavigation } from '@react-navigation/native';
 import supabase from '../supabaseClient';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import BackButton from '../component/BackButton';
 
 const YourApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -47,9 +48,7 @@ const YourApplications = () => {
   return (
     <View style={styles.container}>
       {/* Back Button */}
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-left" size={24} color="#000" />
-      </TouchableOpacity>
+      <BackButton />
 
       <Text style={styles.title}>Your Applications</Text>
 

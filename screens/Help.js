@@ -5,6 +5,7 @@ import supabase from '../supabaseClient';
 import SearchBar from '../component/Help/SearchBar';
 import ArticleList from '../component/Help/ArticleList';
 import ArticleModal from '../component/Help/ArticleModal';
+import BackButton from '../component/BackButton';
 
 const Help = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -125,6 +126,7 @@ const Help = () => {
 
   return (
     <View style={styles.container}>
+      <BackButton />
       <Text style={styles.title}>Help Page</Text>
       <SearchBar
         searchTerm={searchTerm}
