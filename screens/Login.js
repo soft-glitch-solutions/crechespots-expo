@@ -8,6 +8,8 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../supabaseClient';
@@ -48,10 +50,11 @@ const Login = ({ navigation, onLogin }) => {
   };
 
   return (
-    <View style={styles.container}>
+<KeyboardAvoidingView
+  behavior={Platform.OS === 'ios' || Platform.OS === 'android' ? 'padding' : 'height'} // Adjust behavior for both iOS and Android
+  style={styles.container}
+>
       <ScrollView contentContainerStyle={styles.innerContainer}>
-
-
         <View style={styles.inputContainer}>
           <Image source={require('../assets/icons/email.png')} style={styles.icon} />
           <TextInput
@@ -106,12 +109,12 @@ const Login = ({ navigation, onLogin }) => {
 
         <Text style={styles.signUpText}>
           Don't have an account?{' '}
-          <Text style={styles.signUpLink} onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.signUpLink} onPress={() => navigation.navigate('Onboarding')}>
             Sign Up
           </Text>
         </Text>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

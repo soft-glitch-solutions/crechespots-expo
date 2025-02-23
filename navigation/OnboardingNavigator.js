@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,6 +9,10 @@ import {
   Dimensions,
   Alert,
   Image,
+  Keyboard,
+  KeyboardEvent,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; // For dropdown
 import * as ImagePicker from 'expo-image-picker'; // For image upload
@@ -44,6 +48,27 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      (e) => {
+        setKeyboardHeight(e.endCoordinates.height);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
 
   const handleScroll = (event) => {
     const index = Math.floor(event.nativeEvent.contentOffset.x / event.nativeEvent.layoutMeasurement.width);
@@ -150,7 +175,10 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
         scrollEventThrottle={16}
         showsHorizontalScrollIndicator={false}
         ref={scrollViewRef}
-        contentContainerStyle={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollView,
+          { paddingBottom: keyboardHeight > 0 ? 20 : 100 },
+        ]}
       >
         {/* Onboarding Slide 1 */}
         <View style={styles.screen}>
@@ -178,7 +206,11 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           <Image source={require('../assets/icons/email.png')} style={styles.image} />
           <Text style={styles.title}>Enter your Email</Text>
           <Text style={styles.blurb}>We'll use this to create your account.</Text>
-          <View style={styles.inputContainer}>
+          <KeyboardAvoidingView
+            style={styles.inputContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
             <TextInput
               style={styles.input}
               placeholder="Email"
@@ -186,7 +218,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
               onChangeText={setEmail}
               keyboardType="email-address"
             />
-          </View>
+          </KeyboardAvoidingView>
         </View>
 
         {/* Signup Slide 2 - Password and Confirm Password */}
@@ -196,7 +228,11 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           <Text style={styles.blurb}>Choose a strong password to secure your account.</Text>
 
           {/* Password Field */}
-          <View style={styles.inputContainer}>
+          <KeyboardAvoidingView
+            style={styles.inputContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
             <TextInput
               style={styles.input}
               placeholder="Password"
@@ -214,10 +250,14 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
                 style={styles.eyeIcon}
               />
             </TouchableOpacity>
-          </View>
+          </KeyboardAvoidingView>
 
           {/* Confirm Password Field */}
-          <View style={styles.inputContainer}>
+          <KeyboardAvoidingView
+            style={styles.inputContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
             <TextInput
               style={styles.input}
               placeholder="Confirm Password"
@@ -235,28 +275,39 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
                 style={styles.eyeIcon}
               />
             </TouchableOpacity>
-          </View>
+          </KeyboardAvoidingView>
         </View>
 
         <View style={styles.screen}>
           <Image source={require('../assets/icons/label.png')} style={styles.image} />
           <Text style={styles.title}>Your Name</Text>
           <Text style={styles.blurb}>Tell us a little about yourself.</Text>
-          <View style={styles.inputContainer}>
+          <KeyboardAvoidingView
+            style={styles.inputContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
             <TextInput style={styles.input} placeholder="First Name" value={firstName} onChangeText={setFirstName} />
-          </View>
-          <View style={styles.inputContainer}>
+          </KeyboardAvoidingView>
+          <KeyboardAvoidingView
+            style={styles.inputContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
             <TextInput style={styles.input} placeholder="Last Name" value={lastName} onChangeText={setLastName} />
-          </View>
+          </KeyboardAvoidingView>
         </View>
-
 
         {/* Signup Slide 4 - ID Number */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/card.png')} style={styles.image} />
           <Text style={styles.title}>Enter Your ID Number</Text>
           <Text style={styles.blurb}>This helps us verify your identity.</Text>
-          <View style={styles.inputContainer}>
+          <KeyboardAvoidingView
+            style={styles.inputContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
             <TextInput
               style={styles.input}
               placeholder="ID Number"
@@ -265,7 +316,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
               keyboardType="numeric"
               maxLength={13}
             />
-          </View>
+          </KeyboardAvoidingView>
         </View>
 
         {/* Signup Slide 5 - City and Province */}
@@ -286,16 +337,19 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
               ))}
             </Picker>
           </View>
-          <View style={styles.inputContainer}>
+          <KeyboardAvoidingView
+            style={styles.inputContainer}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+          >
             <TextInput
               style={styles.input}
               placeholder="City"
               value={city}
               onChangeText={setCity}
             />
-          </View>
+          </KeyboardAvoidingView>
         </View>
-
 
         {/* Signup Slide 6 - Profile Picture */}
         <View style={styles.screen}>
@@ -311,8 +365,8 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
         </View>
       </ScrollView>
 
-      {/* Footer Navigation */}
-      <View style={styles.footer}>
+      {/* Footer Navigation - Will be covered by keyboard */}
+      <View style={[styles.footer, { bottom: keyboardHeight > 0 ? -keyboardHeight : 20 }]}>
         {currentIndex >= 3 && currentIndex < 7 && (
           <TouchableOpacity style={styles.skipButton} onPress={handleSkipToLogin}>
             <Text style={styles.skipText}>Skip to Login</Text>
@@ -327,8 +381,13 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f5f5f5' },
-  scrollView: { flexGrow: 1 },
+  container: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  scrollView: {
+    flexGrow: 1,
+  },
   screen: { width: screenWidth, justifyContent: 'center', alignItems: 'center', padding: 20 },
   image: { width: 200, height: 200, marginBottom: 20 },
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 10, color: '#333', textAlign: 'center' },
@@ -361,16 +420,6 @@ const styles = StyleSheet.create({
   picker: {
     width: '100%',
   },
-  input: {
-    flex: 1,
-    height: 50,
-    fontSize: 16,
-  },
-  picker: {
-    flex: 1,
-    height: 50,
-    fontSize: 16,
-  },
   uploadButton: {
     backgroundColor: '#bd84f6',
     padding: 15,
@@ -389,7 +438,12 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginTop: 20,
   },
-  footer: { position: 'absolute', bottom: 20, left: 0, right: 0, alignItems: 'center' },
+  footer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
   nextButton: { backgroundColor: '#bd84f6', padding: 15, borderRadius: 10, width: '80%', alignItems: 'center' },
   nextText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
   skipButton: { marginBottom: 10 },
