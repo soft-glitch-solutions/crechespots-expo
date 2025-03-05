@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import Swiper from 'react-native-swiper';
+import Swiper from 'react-native-swiper-flatlist';
 
 const CrecheItem = ({ creche, onSelectCreche }) => {
   const { name, gallery, address, phone_number, capacity, logo, weekly_price, monthly_price, services, facilities } = creche;

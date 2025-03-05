@@ -4,7 +4,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { MaterialCommunityIcons } from 'react-native-vector-icons';
-import Swiper from 'react-native-swiper';
+import Swiper from 'react-native-swiper-flatlist';
 import supabase from '../supabaseClient';
 
 const CrecheDetails = () => {

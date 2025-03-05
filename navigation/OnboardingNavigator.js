@@ -45,10 +45,10 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
   const [idNumber, setIdNumber] = useState('');
   const [city, setCity] = useState('');
   const [province, setProvince] = useState('');
-  const [profilePicture, setProfilePicture] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [showFinalSlide, setShowFinalSlide] = useState(false);
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -76,16 +76,21 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
   };
 
   const handleNext = () => {
-    if (currentIndex < 7) {
-      scrollViewRef.current.scrollTo({ x: (currentIndex + 1) * screenWidth, animated: true });
+    if (currentIndex < 9) {
+      if (currentIndex === 7) {
+        handleSignUp();
+      } else {
+        scrollViewRef.current.scrollTo({ x: (currentIndex + 1) * screenWidth, animated: true });
+      }
     } else {
-      handleSignUp();
+      navigation.navigate('Login');
     }
   };
 
   const handleSignUp = async () => {
-    if (!email || !password || !confirmPassword || !firstName || !lastName || idNumber.length !== 13 || !city || !province || !profilePicture) {
-      Alert.alert('Error', 'Please fill in all fields and upload a profile picture.');
+    if (!email || !password || !confirmPassword || !firstName || !lastName || 
+        idNumber.length !== 13 || !city || !province) {
+      Alert.alert('Error', 'Please fill in all required fields.');
       return;
     }
 
@@ -95,75 +100,43 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
     }
 
     try {
-      // Step 1: Sign up with Supabase Auth
+      // 1. Create auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (authError) {
-        Alert.alert('Signup Failed', authError.message);
-        return;
-      }
+      if (authError) throw authError;
 
-      // Step 2: Upload profile picture to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('profile-pictures')
-        .upload(`public/${email}-profile.jpg`, profilePicture);
-
-      if (uploadError) {
-        Alert.alert('Upload Failed', uploadError.message);
-        return;
-      }
-
-      // Step 3: Insert user details into public.users table
-      const { error: dbError } = await supabase.from('users').insert([
-        {
-          email,
+      // 2. Update existing public.users record (created automatically by Supabase trigger)
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
           first_name: firstName,
           last_name: lastName,
           id_number: idNumber,
-          city,
-          province,
-          profile_picture_url: uploadData?.path,
-        },
-      ]);
+          city: city,
+          province: province,
+          updated_at: new Date().toISOString(),
+          display_name: `${firstName} ${lastName}`,
+        })
+        .eq('id', authData.user.id);
 
-      if (dbError) {
-        Alert.alert('Database Error', dbError.message);
-        return;
-      }
+      if (updateError) throw updateError;
 
-      // Step 4: Mark onboarding as complete and navigate
+      // 3. Show final slide and mark onboarding complete
+      setShowFinalSlide(true);
+      scrollViewRef.current.scrollTo({ x: 7 * screenWidth, animated: true });
       await AsyncStorage.setItem('onboardingCompleted', 'true');
-      await AsyncStorage.setItem('authToken', 'dummyToken');
       onComplete();
+
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred.');
+      Alert.alert('Signup Error', error.message || 'An error occurred during signup');
     }
   };
 
   const handleSkipToLogin = () => {
     navigation.navigate('Login');
-  };
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission Denied', 'Sorry, we need camera roll permissions to upload a profile picture.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setProfilePicture(result.uri);
-    }
   };
 
   return (
@@ -319,7 +292,7 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           </KeyboardAvoidingView>
         </View>
 
-        {/* Signup Slide 5 - City and Province */}
+        {/* Slide 6 - Location (now the last input slide) */}
         <View style={styles.screen}>
           <Image source={require('../assets/icons/location.png')} style={styles.image} />
           <Text style={styles.title}>Your Location</Text>
@@ -351,21 +324,21 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           </KeyboardAvoidingView>
         </View>
 
-        {/* Signup Slide 6 - Profile Picture */}
-        <View style={styles.screen}>
-          <Image source={require('../assets/icons/camera.png')} style={styles.image} />
-          <Text style={styles.title}>Let Us See What You Look Like</Text>
-          <Text style={styles.blurb}>Upload a profile picture so we can recognize you.</Text>
-          <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
-            <Text style={styles.uploadButtonText}>Upload Profile Picture</Text>
-          </TouchableOpacity>
-          {profilePicture && (
-            <Image source={{ uri: profilePicture }} style={styles.profileImage} />
-          )}
-        </View>
+        {/* Final Slide - Thank You */}
+        {showFinalSlide && (
+          <View style={styles.screen}>
+            <Image source={require('../assets/icons/mail.png')} style={styles.image} />
+            <Text style={styles.title}>Almost There!</Text>
+            <Text style={styles.blurb}>
+              Please check your email to verify your account.
+              {"\n\n"}
+              Click LOGIN below to continue.
+            </Text>
+          </View>
+        )}
       </ScrollView>
 
-      {/* Footer Navigation - Will be covered by keyboard */}
+      {/* Footer Navigation */}
       <View style={[styles.footer, { bottom: keyboardHeight > 0 ? -keyboardHeight : 20 }]}>
         {currentIndex >= 3 && currentIndex < 7 && (
           <TouchableOpacity style={styles.skipButton} onPress={handleSkipToLogin}>
@@ -373,7 +346,11 @@ const OnboardingScreen = ({ onComplete, navigation }) => {
           </TouchableOpacity>
         )}
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextText}>{currentIndex < 8 ? 'NEXT' : 'SIGN UP'}</Text>
+          <Text style={styles.nextText}>
+            {currentIndex === 7 ? 'SIGN UP' : 
+             currentIndex === 8 ? 'LOGIN' : 
+             'NEXT'}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
